@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <head>
+    <!-- custom CSS -->
+    <style type="text/css">
+    /* Importing a local font */
+      @font-face {
+        font-family: PacFont;
+        src: url(assets/Fonts/PacFontRegular.ttf);
+      }
+      /* Customizing the p5 JS Loading Screen */
+      #p5_loading {
+        color: #f4cb2a;
+        width: 760px;
+        height: 500px;
+        border: 5px solid #f4cb2a;
+        font-size: 200%;
+        text-align: center;
+        margin: auto;
+        align-items: center;
+        position: relative;
+      }
+      /* Modifying the progress bar in the loading screen */
+/*      #progress_bar {
+        background-color: blue;
+        height: 25px;
+        width: 20%;
+        position: absolute;
+        top: 250px;
+        left: 0px;
+      }*/
+      body {
+        background-color: rgb(192, 133, 201, 0.9);
+      }
+      #center {
+        width: 760;
+        height: 500;
+        text-align: center;
+      }
+      #Heading{
+        text-align: center;
+        color: black;
+        font-size: 20px;
+        font-family: PacFont;
+        font-weight: 100;
+      }
+/*      #scoreboard{
+        width: 100%;
+        text-align: center;
+        padding-top: 30px;
+      }*/
+        #items {
+        max-width: 760px;
+        margin: auto;
+        display: inline-flex;
+        text-align: center;
+        width: 100%;
+        /* padding-left: 25px; */
+      }
+      #items div{
+        color: black;
+      }
+      #score_text:after {
+          content: "\00a0";
+      }
+      #score_text{
+        font-size: 15;
+      }
+      #content{
+        color:black;
+        width: 100%;
+      }
+/*      #content-text{
+        max-width: 760px;
+        margin: auto;
+        text-align: left!important;
+      }*/
+      #content h2,p{
+        /* text-align: center; */
+      }
+      #score_text{
+        font-family: PacFont;
+      }
+      #current_lives{
+        font-size: 50 !important;
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <div id = "Heading">
+      <h1><u>3D World</u></h1>
+    </div>
+    <h2>Access the World</h2>
+    <div><a href="3D-world/index.html">3D World</a></div>
+
+    <div id = "content">
+      <div id= "content-text">
+        <h2>Instructions</h2>
+        <p> - Use the W,S,A,D keys to move around the world. </p>
+        <p> - Use the mouse to adjust the camera angle.</p>
+        <p> - Feel free to explore the world, color the bricks, create your own drawing and enjoy the rain!</p>
+        <p> - COMING SOON - the maze and the escape room. </p>
+        <h2>Documentation</h2>
+          <p>
+            <img style="width: 45%" src = "world.jpg">
+          </p>
+          <p>
+            The aim of this project is to produce a 3D environment, which can be explored through the use of W, A, S & D and the mouse. This assignment is currently only the first version of our final project where this project will be further developed. Additional developments will allow the user to visualize themselves in front of the screen as a car which they can drive around to explore the world. Physics including collisions and gravity will also be included to give this project a more real world feel.
+          </p>
+          <p>
+            There will be some more potential developments to the project which are still in discussion such as a maze that would have to be completed in 3D using the car. Additionally, we plan on using the Web RTC Library that we used for Assignment 06, in order to potentially allow multiple cars to coexist in a specific game and roam around, or possibly, if the skills allow, race with one another. As we progress with the project and get to know of the capabilities of the A-Frame Library, we can develop and polish our idea further!
+          </p>
+          <h2>Technologies Used</h2>
+          <p>
+           We will be working with the VR framework (A-frame) where a special technique will need to be used to position the camera in such a way that it is facing downwards onto our user and from a specific distance at a certain angle at all times. We will also be implementing physics and mechanics to our user objects as well as all the other objects in the game so we will be taking help from: https://github.com/n5ro/aframe-physics-system. We will also need to use our prior knowledge of p5 regarding classes and objects and user movements wherever needed.
+          </p>
+
+      </div>
+    </div>
+
+  </body>
+</html>
