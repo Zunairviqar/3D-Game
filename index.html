@@ -35,17 +35,21 @@
 	    <a-scene physics="gravity: -9.8; restitution: 0.7" id="VRScene">
 
 				<a-assets id="VRAssets" timeout="90000">
+					<img src="images/iron_block.png" id="iron">
 
 					<a-asset-item id="truck" src="models/truck/scene.gltf"></a-asset-item>
+					<a-asset-item id="bowling" src="models/bowling_pins/scene.gltf"></a-asset-item>
+					<a-asset-item id="ball" src="models/bowling_ball/scene.gltf"></a-asset-item>
+					<a-asset-item id="road" src="models/american_road/scene.gltf"></a-asset-item>
 
 				</a-assets>
 
 
 				<a-entity progressive-controls ></a-entity>
 
-				<a-plane color="#f98b3f" scale="200 200 1" repeat="5 5 1" rotation="-90 0 0" static-body></a-plane>
+				<a-plane color="#f98b3f" position="0 0 0" scale="400 400 1" repeat="5 5 1" rotation="-90 0 0" static-body></a-plane>
 
-				<a-box color="#AA0000" position="-3.5 0.5 -4"
+				<!-- <a-box color="#AA0000" position="-3.5 0.5 -4"
 					dynamic-body>
 					<a-box color = "AA0000" opacity = "0.2" scale = "2 3 1.5" position = "0 1 0">
 					</a-box>
@@ -60,7 +64,7 @@
 				</a-sphere>
 
 				<a-box color="#00AAFF" radius = "0.05" position="3.5 2 -4" dynamic-body></a-box>
-
+ -->
 	    </a-scene>
 
 	</body>
