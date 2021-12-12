@@ -15,13 +15,15 @@ let pump;
 
 let field;
 
-let road1, road2, road3; 
+let road1, road2, road3;
 
 let accel;
 
 let reset = false;
 
 let bowling;
+
+let fuel;
 
 function setup() {
 	// no canvas needed
@@ -44,7 +46,9 @@ function setup() {
 	// world.camera.cameraEl.removeAttribute('look-controls')
 
 	// rotate the camera down at an angle
-	world.camera.holder.object3D.rotation.set(radians(-45), 0, 0);
+	world.camera.holder.object3D.rotation.set(radians(-15), 0, 0);
+
+	fuel = 100;
 
 	// Road Model
 	road1 = new GLTF({
@@ -146,9 +150,9 @@ function setup() {
 	// add bricks
 	for (let j = 0; j < 10; j++ ){
 		total = random(1, 7)
-		cx = random(-15, 15);
+		cx = random(-25, 25);
 		cy = 0.25;
-		cz = random(20, -20);
+		cz = random(-120, -140);
 		for (let i = 0; i < total; i++) {
 			// first layer of boxes
 			boxes.push(new Cube(cx, cy, cz));
@@ -169,8 +173,8 @@ function setup() {
 	}
 
 	// add bowling pins
-	cx = -5.0
-	cz = 1
+	cx = -15.0
+	cz = -120
 	pins.push(new BowlingPins(cx,cz));
 	pins.push(new BowlingPins(cx-0.5,cz-0.5));
 	pins.push(new BowlingPins(cx-0.5,cz+0.5));
@@ -195,13 +199,13 @@ function setup() {
 	});
 
 	ball.tag.setAttribute('dynamic-Body', "linearDamping: 0.01");
-	// world.add(ball);
+	world.add(ball);
 
 
 }
 
 function draw() {
-	world.camera.holder.object3D.rotation.set(radians(-45), 0, 0);
+	world.camera.holder.object3D.rotation.set(radians(-25), 0, 0);
 
 	if (keyIsDown(87)){
 		if(truck.rotationY<0){
@@ -279,6 +283,20 @@ function draw() {
 	// if (reset == true) {
 
 	// }
+
+	// if (frameCount % 300){
+	// 	fuel -= 1;
+	// }
+	// // text on maze
+	// var fueltext = new Text({
+	// 	text: 'Fuel!',
+	// 	red: 0, green: 0, blue: 0,
+	// 	side: 'double',
+	// 	x: 0, y: height, z: 0,
+	// 	scaleX: 100, scaleY: 100, scaleZ: 1
+	// });
+	// world.add(fueltext);
+
 }
 function keyPressed(){
 	if (keyCode == 66){
@@ -291,8 +309,6 @@ function keyPressed(){
 			console.log("newy " + boxes[0].box.x)
 			boxes[0].box.z = boxes[0].pz;
 			console.log("newz " + boxes[0].box.x)
-		// }
-
 	}
 }
 
@@ -301,7 +317,7 @@ class Cube {
 	constructor(x,y,z) {
 		// new brick
 		this.box = new Box({
-			
+
 			x:x, y:y, z:z,
 			width:0.9, height: 0.5, depth: 0.5,
 			// iron asset
@@ -320,7 +336,7 @@ class Cube {
 		this.pz = z;
 
 		this.box.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
-		// world.add(this.box);
+		world.add(this.box);
 	}
 
 }
@@ -338,8 +354,8 @@ class BowlingPins {
 			scaleZ:0.0015
 			// rotationY:30
 		});
-		// bowling.tag.setAttribute('dynamic-Body', "linearDamping: 0.1");
-		// world.add(bowling);
+		bowling.tag.setAttribute('dynamic-Body', "linearDamping: 0.1");
+		world.add(bowling);
 		}
 }
 
