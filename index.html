@@ -12,18 +12,13 @@
 		<script src="https://unpkg.com/aframe-event-set-component@^4.0.0/dist/aframe-event-set-component.min.js"></script>
 		<script src="https://unpkg.com/super-hands@2.1.0/dist/super-hands.min.js"></script>
 		<script src="dist/aframe-physics-system.min.js"></script>
-
-		<!-- a frame extras library -->
-		<!-- <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v$npm_package_version/dist/aframe-physics-system.min.js"></script> -->
-
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js" integrity="sha512-WzkwpdWEMAY/W8WvP9KS2/VI6zkgejR4/KTxTl4qHx0utqeyVE0JY+S1DlMuxDChC7x0oXtk/ESji6a0lP/Tdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 		<!-- AFrameP5 library -->
-		<!-- <script src="https://craignyu.github.io/aframep5/libraries/aframep5-v2.1.js"></script> -->
+		<script src="https://craignyu.github.io/aframep5/libraries/aframep5-v2.1.js"></script>
 
 		<!-- Your p5 Sketch -->
 		<script src="sketch.js"></script>
-		<!-- <script src="sketch2.js"></script> -->
 
 
 		<!-- custom styles -->
@@ -38,65 +33,33 @@
 
 		<!-- container to hold our VR scene - make sure to give this element an ID of 'VRScene' -->
 	    <a-scene physics="gravity: -9.8; restitution: 0.7" id="VRScene">
-	    	<!-- <a-entity camera look-controls>
-	   		</a-entity> -->
 
-	   		<!-- <a-box dynamic-body position="5 0.5 0" width="1" height="1" depth="1"></a-box> -->
-	    	<!--
-		       The 'a-assets' container is used to load in any external artwork you may want to use as "textures" for your objects. Ensure that this element has an ID of 'VRAssets'
+				<a-assets id="VRAssets" timeout="90000">
 
-		       Textures can be loaded by creating a new 'a-asset' tag inside of the 'a-assets' container.
-		       When doing this you will need to make sure to give your textures a unique ID -
-		       this will be used by p5 to create new objects.
-
-		       Example:
-
-		       <img id="ITEM_ID_GOES_HERE" src="images/gold_block.png">
-				-->
-				<!-- <a-entity cursor position="0 0 -5"></a-entity> -->
-
-				<!-- <a-entity geometry="primitive: plane" material="color: yellow"
-          		position="-10 -10 0" sound="src: #bgSound; autoplay: true; loop: true"></a-entity> -->
-
-				<!-- <a-entity id="elmo" geometry="primitive: box"
-          		sound="src: #bgSound; on: click"></a-entity> -->
-
-				<!-- <a-entity sound="src: #bgSound; autoplay: true"></a-entity> -->
-
-				<a-assets id="VRAssets">
-
-					<!-- <img src="images/new.jpeg" id="sky1">
-					<img src="images/iron_block.png" id="iron">
-					<img src="images/sky.jpg" id="sky">
-
-					<a-asset-item id="sky" src="3D-Models/sky/scene.gltf"></a-asset-item>
-					<a-asset-item id="ball" src="images/ball/scene.gltf"></a-asset-item>
-					<a-asset-item id="dog" src="images/shiba/scene.gltf"></a-asset-item>
-					<a-asset-item id="cat" src="images/cat/scene.gltf"></a-asset-item>
-					<a-asset-item id="maze" src="3D-Models/maze/scene.gltf"></a-asset-item>
-					<a-asset-item id="prison" src="3D-Models/prison_cell/scene.gltf"></a-asset-item> -->
-
-   					<!-- <audio id="bgSound" src="sounds/bg.mp3" preload="auto"></audio> -->
+					<a-asset-item id="truck" src="models/truck/scene.gltf"></a-asset-item>
 
 				</a-assets>
 
-				<a-entity progressive-controls position="0 0 5"></a-entity>
 
-				<a-plane color="#111111" scale="50 50 1" repeat="5 5 1" rotation="-90 0 0" static-body></a-plane>
+				<a-entity progressive-controls ></a-entity>
 
-				<a-box color="#AA0000" radius = "0.05" position="-3.5 0.5 -4" dynamic-body></a-box>
+				<a-plane color="#f98b3f" scale="200 200 1" repeat="5 5 1" rotation="-90 0 0" static-body></a-plane>
+
+				<a-box color="#AA0000" position="-3.5 0.5 -4"
+					dynamic-body>
+					<a-box color = "AA0000" opacity = "0.2" scale = "2 3 1.5" position = "0 1 0">
+					</a-box>
+				</a-box>
 
 				<a-sphere color="#00AA00" radius = "0.5" position="-1 4 -4" grabbable
-					dynamic-body="linearDamping: 0.05">
+					dynamic-body="linearDamping: 0.05; mass: 5;">
 				</a-sphere>
 
 				<a-sphere color="#FFAA00" radius = "0.5" position="1 4 -4" grabbable
-					dynamic-body="linearDamping: 0.05; angularDamping: 0.05;">
+					dynamic-body="linearDamping: 0.5; angularDamping: 0.95; mass: 10;">
 				</a-sphere>
 
 				<a-box color="#00AAFF" radius = "0.05" position="3.5 2 -4" dynamic-body></a-box>
-
-
 
 	    </a-scene>
 
