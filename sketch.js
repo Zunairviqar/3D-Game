@@ -11,6 +11,10 @@ let cx, cy, cz, total;
 
 let pins = [];
 
+let pump;
+
+let field;
+
 let road1, road2, road3; 
 
 let accel;
@@ -100,6 +104,37 @@ function setup() {
 	// Making the truck collidable with other objects
 	truck.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
 	world.add(truck);
+
+	// Pump Model
+	pump = new GLTF({
+		asset: 'pump',
+		x: 6,
+		y: 1,
+		z:-20,
+		scaleX:0.04,
+		scaleY:0.04,
+		scaleZ:0.04,
+		rotationY:-90
+	});
+
+	// Making the truck collidable with other objects
+	// pump.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
+	world.add(pump);
+
+	// Pump Model
+	field = new GLTF({
+		asset: 'field',
+		x: 0,
+		y: -1,
+		z:-90,
+		scaleX:3,
+		scaleY:3,
+		scaleZ:3
+	});
+
+	// Making the truck collidable with other objects
+	// pump.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
+	world.add(field);
 
 
 	// add trees
