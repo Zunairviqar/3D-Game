@@ -3,7 +3,7 @@ let carX, carZ;
 let car;
 let moveSpeed;
 let world;
-let truck;
+let truck, fuelbox;
 
 let trees = [];
 let boxes = [];
@@ -14,6 +14,8 @@ let pins = [];
 let pump;
 
 let field;
+ 
+let lights = [];
 
 let road1, road2, road3;
 
@@ -25,6 +27,8 @@ let bowling;
 
 let fuel;
 
+let particles = [];
+
 function setup() {
 	// no canvas needed
 	noCanvas();
@@ -34,8 +38,7 @@ function setup() {
 	world = new World('VRScene');
 
 	// set a background color for the world using RGB values
-	world.setBackground(173, 216, 230);
-
+	world.setBackground(192, 133, 201);
 	// put the user up above the world
 	world.setUserPosition(0,7,8);
 	//
@@ -50,6 +53,112 @@ function setup() {
 
 	fuel = 100;
 
+	// add sky
+	sky = new Sky({
+		asset: 'sky'
+	});
+	world.add(sky);
+	// bgSound.setVolume(0.3);
+
+	// Grass field Model
+	field = new GLTF({
+		asset: 'field',
+		x: 0,
+		y: -0.6,
+		z: 0,
+		scaleX:2,
+		scaleY:2,
+		scaleZ:2
+	});
+
+	// add trees
+	for (let i = 0; i < 100; i++) {
+		trees.push(new Tree(random(10, 50), random(-40, 50), random(2.5, 3.3)));
+		trees.push(new Tree(random(-50, -10), random(-40, 50), random(2.5, 3.3)));
+	}
+
+	placebowling();
+	placefuel();
+	placebrick();
+	placelamps();
+	placecar();
+	// placeRoadBlocks();
+	playground();
+	placeroad();
+	placefence();
+
+}
+
+function draw() {
+	
+	world.camera.holder.object3D.rotation.set(radians(-25), 0, 0);
+	// always create a new rain particle
+	var temp = new Particle(random(-20, 20), 15, random(-80,10));
+
+	particles.push( temp );
+
+	// draw all rain
+	for (var i = 0; i < particles.length; i++) {
+		var result = particles[i].move();
+		if (result == "gone") {
+			particles.splice(i, 1);
+			i-=1;
+		}
+	}
+
+	if (frameCount % 1000 == 0 && fuelbox.getWidth() > 0.08){
+		fuelbox.setWidth(fuelbox.getWidth()-0.09);
+	}
+	if (fuelbox.getWidth() > 0) {
+		carMovement();
+	}
+
+	// console.log("ogX " + boxes[0].box.x)
+	// console.log("ogy " + boxes[0].box.y)
+	// console.log("ogz " + boxes[0].box.z)
+	// if (reset == true) {
+
+	// }
+
+}
+
+function placefence (){
+	// gate Model
+	let gate = new GLTF({
+		asset: 'gate',
+		x: -5,y: 0,z:-55,
+		scaleX:2,scaleY:2,scaleZ:2,
+		rotationY:90
+	});
+	world.add(gate);
+
+	// fence Model
+	let cx = -25;
+	for (let i = 0; i < 3; i++){
+		let fence = new GLTF({
+			asset: 'fence',
+			x: cx,y: 0,z:-55,
+			scaleX:2,scaleY:2,scaleZ:2,
+			rotationY:70
+		});
+		world.add(fence);
+		cx -= 10;
+	}
+}
+
+function playground() {
+	// create a plane to serve as our "ground"
+	let g = new Plane({
+		x:0, y:0.2, z:-75,
+		width:100, height:40,
+		red:64, green:128, blue:0,
+		rotationX:-90});
+
+	// add the plane to our world
+	world.add(g);
+}
+
+function placeroad (){
 	// Road Model
 	road1 = new GLTF({
 		asset: 'road',
@@ -72,26 +181,118 @@ function setup() {
 		scaleZ:0.015
 		// rotationX:radians(80)
 	});
-	// Road Model
-	road3 = new GLTF({
-		asset: 'road',
-		x: 0,
-		y: 0,
-		z:-80,
-		scaleX:0.015,
-		scaleY:0.015,
-		scaleZ:0.015
-		// rotationX:radians(80)
-	});
 
-	// road.tag.setAttribute('dynamic-Body');
 	world.add(road1);
 	world.add(road2);
-	world.add(road3);
+}
 
+function placeRoadBlocks(){
+	let rblock = new GLTF({
+		asset: 'rblock',
+		x: 1,y: 1.5,z:-15,
+		scaleX:2, scaleY:2,scaleZ:2,
+		rotationY:-47
+	});
+	console.log("road blokkk")
+	world.add(rblock)
+}
+
+function carMovement () {
+	// car movement
+	if (keyIsDown(87)){
+		if(truck.rotationY<0){
+			rotationY = truck.rotationY%360 + 360;
+		}
+		else{
+			rotationY = truck.rotationY%360;
+		}
+		if(rotationY<=90 && rotationY>=0){
+			moveX = map(rotationY, 0, 90, moveSpeed, 0)
+			truck.nudge(0,0,moveX-moveSpeed);
+			fuelbox.nudge(0,0,moveX-moveSpeed)
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=180 && rotationY>90)){
+			moveX = map(rotationY, 90, 180, 0, moveSpeed)
+			truck.nudge(0,0,moveX-moveSpeed);
+			fuelbox.nudge(0,0,moveX-moveSpeed);
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=270 && rotationY>180)){
+			moveX = map(rotationY, 270, 180, 0, moveSpeed)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=360 && rotationY>270)){
+			moveX = map(rotationY, 270, 360, 0, moveSpeed)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+		}
+	}
+	if (keyIsDown(83)){
+		if(truck.rotationY<0){
+			rotationY = truck.rotationY%360 + 360;
+		}
+		else{
+			rotationY = truck.rotationY%360;
+		}
+		if(rotationY<=90 && rotationY>=0){
+			moveX = map(rotationY, 0, 90, moveSpeed, 0)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=180 && rotationY>90)){
+			moveX = map(rotationY, 90, 180, 0, moveSpeed)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=270 && rotationY>180)){
+			moveX = map(rotationY, 270, 180, 0, moveSpeed)
+			truck.nudge(0,0,(moveX-moveSpeed));
+			fuelbox.nudge(0,0,(moveX-moveSpeed));
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+		}
+		else if((rotationY<=360 && rotationY>270)){
+			moveX = map(rotationY, 270, 360, 0, moveSpeed)
+			truck.nudge(0,0,(moveX-moveSpeed));
+			fuelbox.nudge(0,0,(moveX-moveSpeed));
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+		}
+	}
+	if (keyIsDown(68)){
+		truck.spinY(-2);
+		fuelbox.spinY(-2);
+	}
+	if (keyIsDown(65)){
+		truck.spinY(2);
+		fuelbox.spinY(2);
+	}
+}
+
+function placecar() {
 	carX = 0;
 	carZ = 0;
-	moveSpeed = 0.15;
+	moveSpeed = 0.3;
 
 	// Truck Model
 	truck = new GLTF({
@@ -104,55 +305,59 @@ function setup() {
 		scaleZ:0.005,
 		rotationY:90
 	});
+	// Fuel bar
+	fuelbox = new Box({
+		x:carX, y:2, z:carZ,
+		width:0.9, height: 0.1, depth: 0.05,
+		red:255, green:0, blue:0,
+	});
+
+	world.add(fuelbox);
 
 	// Making the truck collidable with other objects
 	truck.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
 	world.add(truck);
+}
 
-	// Pump Model
-	pump = new GLTF({
-		asset: 'pump',
-		x: 6,
-		y: 1,
-		z:-20,
-		scaleX:0.04,
-		scaleY:0.04,
-		scaleZ:0.04,
-		rotationY:-90
-	});
-
-	// Making the truck collidable with other objects
-	// pump.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
-	world.add(pump);
-
-	// Pump Model
-	field = new GLTF({
-		asset: 'field',
-		x: 0,
-		y: -1,
-		z:-90,
-		scaleX:3,
-		scaleY:3,
-		scaleZ:3
-	});
-
-	// Making the truck collidable with other objects
-	// pump.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
-	world.add(field);
-
-
-	// add trees
-	for (let i = 0; i < 100; i++) {
-		trees.push(new Tree(random(10, 50), random(-90, 50), random(2.5, 3.3)));
-		trees.push(new Tree(random(-50, -10), random(-90, 50), random(2.5, 3.3)));
+function placelamps() {
+	// Street Light Model
+	cz = 20
+	let light;
+	for (let i = 0; i < 8; i++){
+		light = new GLTF({
+			asset: 'light',
+			x: 6,
+			y: -0.4,
+			z: cz,
+			scaleX:0.003,
+			scaleY:0.003,
+			scaleZ:0.003
+		})
+		world.add(light)
+		lights.push(light)
+		light = new GLTF({
+			asset: 'light',
+			x: -6,
+			y: -0.4,
+			z: cz,
+			scaleX:0.003,
+			scaleY:0.003,
+			scaleZ:0.003,
+			rotationY:-90
+		})
+		world.add(light)
+		lights.push(light)
+		cz -= 10
 	}
+}
 
+function placebrick () {
 	// add bricks
 	for (let j = 0; j < 10; j++ ){
 		total = random(1, 7)
-		cx = random(-25, 25);
+		cx = random(-30, 30);
 		cy = 0.25;
-		cz = random(-120, -140);
+		cz = random(-50, -85);
 		for (let i = 0; i < total; i++) {
 			// first layer of boxes
 			boxes.push(new Cube(cx, cy, cz));
@@ -160,21 +365,39 @@ function setup() {
 			if (total >= 2 && i < total-1){
 				boxes.push(new Cube(cx+0.5, cy+0.5, cz))
 			}
-			// // third layer
-			// if (total >= 3 && i < total-2){
-			// 	boxes.push(new Cube(cx+1.0, cy+1.0, cz))
-			// }
-			// // fourth layer
-			// if (total >= 4 && i < total-3){
-			// 	boxes.push(new Cube(cx+1.5, cy+1.5, cz))
-			// }
 			cx += 0.9;
 		}
 	}
+	
+	cy = 0.25;
+	cz = -80;
+	for (let i = 0; i < 7; i++) {
+		cx = 15;
+		for (let i = 0; i < 5; i++) {
+			// first layer of boxes
+			boxes.push(new Cube(cx, cy, cz));
+			cx+=0.9
+		}
+		cy += 0.5
+	}
 
+	cy = 0.25;
+	cx = -15;
+	for (let i = 0; i < 6; i++) {
+		cz = -70;
+		for (let i = 0; i < 6; i++) {
+			// first layer of boxes
+			boxes.push(new Cube(cx, cy, cz));
+			cz+=0.9
+		}
+		cy += 0.5
+	}
+}
+
+function placebowling () {
 	// add bowling pins
-	cx = -15.0
-	cz = -120
+	let cx = -22.0
+	let cz = -80
 	pins.push(new BowlingPins(cx,cz));
 	pins.push(new BowlingPins(cx-0.5,cz-0.5));
 	pins.push(new BowlingPins(cx-0.5,cz+0.5));
@@ -200,104 +423,71 @@ function setup() {
 
 	ball.tag.setAttribute('dynamic-Body', "linearDamping: 0.01");
 	world.add(ball);
+}
 
+function placefuel () {
+	// Pump Model
+	pump = new GLTF({
+		asset: 'pump',
+		x: 6,
+		y: 0.5,
+		z:-25,
+		scaleX:0.04,
+		scaleY:0.04,
+		scaleZ:0.04,
+		rotationY:-90
+	});
+	// fuel park boundaries
+	let parking = new Plane ({
+		x:4, y:0.3, z:-24.9,
+		width:2.8, height:2.5,
+		red:255, green:153, blue:153,
+		rotationX:-90
+	});
+	// Fuel button
+	let fuelbutton = new Cylinder ({
+		x: 6, y:4.5, z:-24.2,
+		height: 0.03,
+		radius: 0.2,
+		red: 0, green:255, blue:0,
+		rotationX: 90,
+		enterFunction: function(theBox) {
+			// make the cube change color
+			theBox.setColor(0, 153, 51);
+		},
+		leaveFunction: function(theBox) {
+			// make the cube original color
+			theBox.setColor(0, 255, 0);
+		},
+		clickFunction:  function(entity) {
+			console.log(truck.x, truck.z)
+			if (truck.x >= 3.75 &&
+				truck.x <= 4.60 &&
+				truck.z <= -23.8 &&
+				truck.z >= -25.25) {
+
+					fuelbox.setWidth(0.9);
+			}
+			
+		},
+	})
+
+	// fuel text
+	let fueltext = new Text({
+		text: 'FILL',
+		red: 0, green: 51, blue: 0,
+		side: 'double',
+		x: 6, y: 4.5, z: -24.16,
+		scaleX: 4, scaleY: 4, scaleZ: 4
+	});
+
+	world.add(fueltext);
+	world.add(fuelbutton);
+	world.add(parking);
+	world.add(pump);
 
 }
 
-function draw() {
-	world.camera.holder.object3D.rotation.set(radians(-25), 0, 0);
-
-	if (keyIsDown(87)){
-		if(truck.rotationY<0){
-			rotationY = truck.rotationY%360 + 360;
-		}
-		else{
-			rotationY = truck.rotationY%360;
-		}
-		if(rotationY<=90 && rotationY>=0){
-			moveX = map(rotationY, 0, 90, moveSpeed, 0)
-			truck.nudge(0,0,moveX-moveSpeed);
-			truck.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=180 && rotationY>90)){
-			moveX = map(rotationY, 90, 180, 0, moveSpeed)
-			truck.nudge(0,0,moveX-moveSpeed);
-			truck.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=270 && rotationY>180)){
-			moveX = map(rotationY, 270, 180, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=360 && rotationY>270)){
-			moveX = map(rotationY, 270, 360, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-	}
-	if (keyIsDown(83)){
-		if(truck.rotationY<0){
-			rotationY = truck.rotationY%360 + 360;
-		}
-		else{
-			rotationY = truck.rotationY%360;
-		}
-		if(rotationY<=90 && rotationY>=0){
-			moveX = map(rotationY, 0, 90, moveSpeed, 0)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=180 && rotationY>90)){
-			moveX = map(rotationY, 90, 180, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=270 && rotationY>180)){
-			moveX = map(rotationY, 270, 180, 0, moveSpeed)
-			truck.nudge(0,0,(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=360 && rotationY>270)){
-			moveX = map(rotationY, 270, 360, 0, moveSpeed)
-			truck.nudge(0,0,(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-	}
-	if (keyIsDown(68)){
-		truck.spinY(-2);
-	}
-	if (keyIsDown(65)){
-		truck.spinY(2);
-	}
-	// console.log("ogX " + boxes[0].box.x)
-	// console.log("ogy " + boxes[0].box.y)
-	// console.log("ogz " + boxes[0].box.z)
-	// if (reset == true) {
-
-	// }
-
-	// if (frameCount % 300){
-	// 	fuel -= 1;
-	// }
-	// // text on maze
-	// var fueltext = new Text({
-	// 	text: 'Fuel!',
-	// 	red: 0, green: 0, blue: 0,
-	// 	side: 'double',
-	// 	x: 0, y: height, z: 0,
-	// 	scaleX: 100, scaleY: 100, scaleZ: 1
-	// });
-	// world.add(fueltext);
-
-}
 function keyPressed(){
 	if (keyCode == 66){
 		reset = true
@@ -384,5 +574,60 @@ class Tree {
 		// this.leaves.tag.setAttribute('dynamic-Body');
 		world.add(this.stem);
 		world.add(this.leaves);
+	}
+}
+
+// class to describe a rain particle's behavior
+class Particle {
+
+	constructor(x,y,z) {
+
+		// construct a new Box that lives at this position
+		this.myBox = new Cone({
+			x:x, y:y, z:z,
+			red: 179, green: 224, blue: 255,
+			height: 0.3,
+			radiusBottom: 0.03, radiusTop: 0.001
+		});
+
+		// add the box to the world
+		world.add(this.myBox);
+
+		// keep track of an offset in Perlin noise space
+		this.xOffset = random(1000);
+		this.zOffset = random(2000, 3000);
+	}
+
+	// function to move our box
+	move() {
+		// compute how the particle should move
+		// the particle should always move up by a small amount
+		var yMovement = -0.15;
+
+		// the particle should randomly move in the x & z directions
+		var xMovement = map( noise(this.xOffset), 0, 1, -0.01, 0.01);
+		var zMovement = map( noise(this.zOffset), 0, 1, -0.01, 0.01);
+
+		// update our poistions in perlin noise space
+		this.xOffset += 0.01;
+		this.yOffset += 0.01;
+
+		// set the position of our box (using the 'nudge' method)
+		this.myBox.nudge(xMovement, yMovement, zMovement);
+
+		// make the boxes shrink a little bit
+		var boxScale = this.myBox.getScale();
+		this.myBox.setScale( boxScale.x, boxScale.y, boxScale.z);
+
+		// if we get too small we need to indicate that this box is now no longer viable
+		if (boxScale.x <= 0) {
+			// remove the box from the world
+			world.remove(this.myBox);
+
+			return "gone";
+		}
+		else {
+			return "ok";
+		}
 	}
 }
