@@ -14,12 +14,10 @@ let pins = [];
 let pump;
 
 let field;
- 
+
 let lights = [];
 
 let road1, road2, road3;
-
-let accel;
 
 let reset = false;
 
@@ -28,6 +26,14 @@ let bowling;
 let fuel;
 
 let particles = [];
+
+// user position & velocity
+const accel = 0.01;
+let position, velocity;
+
+// friction
+const frictionMag = 0.005;
+let friction;
 
 function setup() {
 	// no canvas needed
@@ -72,7 +78,7 @@ function setup() {
 	});
 
 	// add trees
-	for (let i = 0; i < 100; i++) {
+	for (let i = 0; i < 40; i++) {
 		trees.push(new Tree(random(10, 50), random(-40, 50), random(2.5, 3.3)));
 		trees.push(new Tree(random(-50, -10), random(-40, 50), random(2.5, 3.3)));
 	}
@@ -87,10 +93,39 @@ function setup() {
 	placeroad();
 	placefence();
 
+  // Adding a random cylinder to make it solid
+
+  let grey = random(75,225);
+  let xyz = new Box({
+    x: 0,
+    y: 2,
+    z: -10,
+    height: 4,
+    red: grey, green: grey, blue: grey
+  });
+
+  // important -- set a property on the box to tell the system that this is
+  // an entity that we can collide with!
+  xyz.tag.object3D.userData.solid = true;
+
+  // add the box to the world
+  world.add(xyz);
+
+  // create a user avatar
+  avatar = new Sphere({
+    radius: 0.5,
+    x: 0, y: 0.5, z: -5,
+    red: 0, green: 255, blue: 0
+  });
+  world.add(avatar);
+
+  // set up vectors to hold the user's position & accelration
+  position = createVector(0, -5);
+  velocity = createVector(0, 0);
 }
 
 function draw() {
-	
+
 	world.camera.holder.object3D.rotation.set(radians(-25), 0, 0);
 	// always create a new rain particle
 	var temp = new Particle(random(-20, 20), 15, random(-80,10));
@@ -119,6 +154,57 @@ function draw() {
 	// if (reset == true) {
 
 	// }
+
+
+	if (keyIsDown(65)) {
+		//world.camera.nudgePosition(-moveSpeed, 0, 0);
+		velocity.add(-accel, 0);
+	}
+	if (keyIsDown(68)) {
+		//world.camera.nudgePosition(moveSpeed, 0, 0);
+		velocity.add(accel, 0);
+	}
+
+	if (keyIsDown(87)) {
+		//world.camera.nudgePosition(0, 0, -moveSpeed);
+		velocity.add(0, -accel);
+	}
+	if (keyIsDown(83)) {
+		//world.camera.nudgePosition(0, 0, moveSpeed);
+		velocity.add(0, accel);
+	}
+
+	// apply friction
+	friction = velocity.copy();
+	friction.mult(-1);
+	friction.normalize();
+	friction.mult(frictionMag);
+	velocity.add(friction);
+
+	// add velocity to avatar
+	position.add(velocity);
+
+	// speed limits
+	if (velocity.mag() > 1) {
+		velocity.setMag(1);
+	}
+	if (velocity.mag() < 0.005) {
+		velocity.setMag(0);
+	}
+  console.log(velocity);
+  console.log(velocity.y)
+  moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
+  // console.log(truck.rotationY)
+	// // update position & camera
+	// truck.setPosition(position.x, 0.5, position.y);
+  // 	if(rotationY<=90 && rotationY>=0){
+  // 		moveX = map(rotationY, 0, 90, moveSpeed, 0)
+  // 		truck.nudge(0,0,moveX-moveSpeed);
+  // 		fuelbox.nudge(0,0,moveX-moveSpeed)
+  // 		truck.nudge(moveX,0,0);
+  // 		fuelbox.nudge(moveX,0,0);
+  // 	}
+	// world.setUserPosition(position.x, 5, position.y+2);
 
 }
 
@@ -199,7 +285,7 @@ function placeRoadBlocks(){
 
 function carMovement () {
 	// car movement
-	if (keyIsDown(87)){
+	// if (keyIsDown(87)){
 		if(truck.rotationY<0){
 			rotationY = truck.rotationY%360 + 360;
 		}
@@ -212,7 +298,8 @@ function carMovement () {
 			fuelbox.nudge(0,0,moveX-moveSpeed)
 			truck.nudge(moveX,0,0);
 			fuelbox.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+			// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+      world.setUserPosition(truck.x, 7, truck.z+10);
 		}
 		else if((rotationY<=180 && rotationY>90)){
 			moveX = map(rotationY, 90, 180, 0, moveSpeed)
@@ -220,7 +307,8 @@ function carMovement () {
 			fuelbox.nudge(0,0,moveX-moveSpeed);
 			truck.nudge(-moveX,0,0);
 			fuelbox.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+			// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+      world.setUserPosition(truck.x, 7, truck.z+10);
 		}
 		else if((rotationY<=270 && rotationY>180)){
 			moveX = map(rotationY, 270, 180, 0, moveSpeed)
@@ -228,7 +316,8 @@ function carMovement () {
 			fuelbox.nudge(0,0,-(moveX-moveSpeed));
 			truck.nudge(-moveX,0,0);
 			fuelbox.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+			// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+      world.setUserPosition(truck.x, 7, truck.z+10);
 		}
 		else if((rotationY<=360 && rotationY>270)){
 			moveX = map(rotationY, 270, 360, 0, moveSpeed)
@@ -236,49 +325,54 @@ function carMovement () {
 			fuelbox.nudge(0,0,-(moveX-moveSpeed));
 			truck.nudge(moveX,0,0);
 			fuelbox.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+			// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+      world.setUserPosition(truck.x, 7, truck.z+10);
 		}
-	}
-	if (keyIsDown(83)){
-		if(truck.rotationY<0){
-			rotationY = truck.rotationY%360 + 360;
-		}
-		else{
-			rotationY = truck.rotationY%360;
-		}
-		if(rotationY<=90 && rotationY>=0){
-			moveX = map(rotationY, 0, 90, moveSpeed, 0)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=180 && rotationY>90)){
-			moveX = map(rotationY, 90, 180, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=270 && rotationY>180)){
-			moveX = map(rotationY, 270, 180, 0, moveSpeed)
-			truck.nudge(0,0,(moveX-moveSpeed));
-			fuelbox.nudge(0,0,(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-		else if((rotationY<=360 && rotationY>270)){
-			moveX = map(rotationY, 270, 360, 0, moveSpeed)
-			truck.nudge(0,0,(moveX-moveSpeed));
-			fuelbox.nudge(0,0,(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-		}
-	}
+	// }
+	// if (keyIsDown(83)){
+	// 	if(truck.rotationY<0){
+	// 		rotationY = truck.rotationY%360 + 360;
+	// 	}
+	// 	else{
+	// 		rotationY = truck.rotationY%360;
+	// 	}
+	// 	if(rotationY<=90 && rotationY>=0){
+	// 		moveX = map(rotationY, 0, 90, moveSpeed, 0)
+	// 		truck.nudge(0,0,-(moveX-moveSpeed));
+	// 		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+	// 		truck.nudge(-moveX,0,0);
+	// 		fuelbox.nudge(-moveX,0,0);
+	// 		// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+  //     world.setUserPosition(truck.x, 7, truck.z+10);
+	// 	}
+	// 	else if((rotationY<=180 && rotationY>90)){
+	// 		moveX = map(rotationY, 90, 180, 0, moveSpeed)
+	// 		truck.nudge(0,0,-(moveX-moveSpeed));
+	// 		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+	// 		truck.nudge(moveX,0,0);
+	// 		fuelbox.nudge(moveX,0,0);
+	// 		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+  //     world.setUserPosition(truck.x, 7, truck.z+10);
+	// 	}
+	// 	else if((rotationY<=270 && rotationY>180)){
+	// 		moveX = map(rotationY, 270, 180, 0, moveSpeed)
+	// 		truck.nudge(0,0,(moveX-moveSpeed));
+	// 		fuelbox.nudge(0,0,(moveX-moveSpeed));
+	// 		truck.nudge(moveX,0,0);
+	// 		fuelbox.nudge(moveX,0,0);
+	// 		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+  //     world.setUserPosition(truck.x, 7, truck.z+10);
+	// 	}
+	// 	else if((rotationY<=360 && rotationY>270)){
+	// 		moveX = map(rotationY, 270, 360, 0, moveSpeed)
+	// 		truck.nudge(0,0,(moveX-moveSpeed));
+	// 		fuelbox.nudge(0,0,(moveX-moveSpeed));
+	// 		truck.nudge(-moveX,0,0);
+	// 		fuelbox.nudge(-moveX,0,0);
+	// 		// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+  //     world.setUserPosition(truck.x, 7, truck.z+10);
+	// 	}
+	// }
 	if (keyIsDown(68)){
 		truck.spinY(-2);
 		fuelbox.spinY(-2);
@@ -315,7 +409,7 @@ function placecar() {
 	world.add(fuelbox);
 
 	// Making the truck collidable with other objects
-	truck.tag.setAttribute('static-Body', "shape: box; halfExtents: 1.5 1.5 1.5");
+	truck.tag.setAttribute('static-Body', "shape: box; mass: 100");
 	world.add(truck);
 }
 
@@ -356,7 +450,7 @@ function placebrick () {
 	for (let j = 0; j < 10; j++ ){
 		total = random(1, 7)
 		cx = random(-30, 30);
-		cy = 0.25;
+		cy = 0;
 		cz = random(-50, -85);
 		for (let i = 0; i < total; i++) {
 			// first layer of boxes
@@ -368,7 +462,7 @@ function placebrick () {
 			cx += 0.9;
 		}
 	}
-	
+
 	cy = 0.25;
 	cz = -80;
 	for (let i = 0; i < 7; i++) {
@@ -396,7 +490,7 @@ function placebrick () {
 
 function placebowling () {
 	// add bowling pins
-	let cx = -22.0
+	let cx = -22
 	let cz = -80
 	pins.push(new BowlingPins(cx,cz));
 	pins.push(new BowlingPins(cx-0.5,cz-0.5));
@@ -413,15 +507,17 @@ function placebowling () {
 	ball = new GLTF({
 		asset: 'ball',
 		x: cx+9,
-		y: 0.2,
+		y: 1,
 		z: cz,
-		scaleX:0.4,
-		scaleY:0.4,
-		scaleZ:0.4
+		scaleX:0.8,
+		scaleY:0.8,
+		scaleZ:0.8
 		// rotationY:30
 	});
 
-	ball.tag.setAttribute('dynamic-Body', "linearDamping: 0.01");
+	ball.tag.setAttribute('dynamic-Body', "shape: sphere; radius:15; mass: 50");
+  // bowling.tag.setAttribute('dynamic-Body', "shape: cylinder; radiusTop: 0.05; radiusBottom: 0.05; cylinderAxis: y; mass: 25");
+
 	world.add(ball);
 }
 
@@ -468,7 +564,7 @@ function placefuel () {
 
 					fuelbox.setWidth(0.9);
 			}
-			
+
 		},
 	})
 
@@ -537,14 +633,14 @@ class BowlingPins {
 		bowling = new GLTF({
 			asset: 'bowling',
 			x: x,
-			y: 0,
+			y: 1,
 			z:z,
 			scaleX:0.0015,
 			scaleY:0.0015,
 			scaleZ:0.0015
 			// rotationY:30
 		});
-		bowling.tag.setAttribute('dynamic-Body', "linearDamping: 0.1");
+    bowling.tag.setAttribute('dynamic-Body', "shape: cylinder; radiusTop: 0.05; radiusBottom: 0.05; cylinderAxis: y; mass: 25");
 		world.add(bowling);
 		}
 }
@@ -555,7 +651,7 @@ class Tree {
 
 		// tree stem
 		this.stem = new Cylinder({
-			x: x, y:h, z:z,
+			x: x, y:h/2, z:z,
 			height: h,
 			radius: 0.5,
 			red: 150, green:98, blue:72
@@ -563,7 +659,7 @@ class Tree {
 
 		// tree leaves
 		this.leaves = new Cone({
-			x: x, y:h+h/2, z:z,
+			x: x, y:h, z:z,
 			height:random(2.3, 4),
 			radiusBottom: 1.4, radiusTop: 0.01,
 			red: random(20, 40), green:random(120, 140), blue:0
