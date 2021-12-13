@@ -111,14 +111,6 @@ function setup() {
   // add the box to the world
   world.add(xyz);
 
-  // create a user avatar
-  avatar = new Sphere({
-    radius: 0.5,
-    x: 0, y: 0.5, z: -5,
-    red: 0, green: 255, blue: 0
-  });
-  world.add(avatar);
-
   // set up vectors to hold the user's position & accelration
   position = createVector(0, -5);
   velocity = createVector(0, 0);
@@ -147,65 +139,6 @@ function draw() {
 	if (fuelbox.getWidth() > 0) {
 		carMovement();
 	}
-
-	// console.log("ogX " + boxes[0].box.x)
-	// console.log("ogy " + boxes[0].box.y)
-	// console.log("ogz " + boxes[0].box.z)
-	// if (reset == true) {
-
-	// }
-
-
-	if (keyIsDown(65)) {
-		//world.camera.nudgePosition(-moveSpeed, 0, 0);
-		velocity.add(-accel, 0);
-	}
-	if (keyIsDown(68)) {
-		//world.camera.nudgePosition(moveSpeed, 0, 0);
-		velocity.add(accel, 0);
-	}
-
-	if (keyIsDown(87)) {
-		//world.camera.nudgePosition(0, 0, -moveSpeed);
-		velocity.add(0, -accel);
-	}
-	if (keyIsDown(83)) {
-		//world.camera.nudgePosition(0, 0, moveSpeed);
-		velocity.add(0, accel);
-	}
-
-	// apply friction
-	friction = velocity.copy();
-	friction.mult(-1);
-	friction.normalize();
-	friction.mult(frictionMag);
-	velocity.add(friction);
-
-	// add velocity to avatar
-	position.add(velocity);
-
-	// speed limits
-	if (velocity.mag() > 1) {
-		velocity.setMag(1);
-	}
-	if (velocity.mag() < 0.005) {
-		velocity.setMag(0);
-	}
-  console.log(velocity);
-  console.log(velocity.y)
-  moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
-  // console.log(truck.rotationY)
-	// // update position & camera
-	// truck.setPosition(position.x, 0.5, position.y);
-  // 	if(rotationY<=90 && rotationY>=0){
-  // 		moveX = map(rotationY, 0, 90, moveSpeed, 0)
-  // 		truck.nudge(0,0,moveX-moveSpeed);
-  // 		fuelbox.nudge(0,0,moveX-moveSpeed)
-  // 		truck.nudge(moveX,0,0);
-  // 		fuelbox.nudge(moveX,0,0);
-  // 	}
-	// world.setUserPosition(position.x, 5, position.y+2);
-
 }
 
 function placefence (){
@@ -284,95 +217,87 @@ function placeRoadBlocks(){
 }
 
 function carMovement () {
+  if (keyIsDown(65)) {
+    //world.camera.nudgePosition(-moveSpeed, 0, 0);
+    velocity.add(-accel, 0);
+  }
+  if (keyIsDown(68)) {
+    //world.camera.nudgePosition(moveSpeed, 0, 0);
+    velocity.add(accel, 0);
+  }
+
+  if (keyIsDown(87)) {
+    //world.camera.nudgePosition(0, 0, -moveSpeed);
+    velocity.add(0, -accel);
+  }
+  if (keyIsDown(83)) {
+    //world.camera.nudgePosition(0, 0, moveSpeed);
+    velocity.add(0, accel);
+  }
+
+  // apply friction
+  friction = velocity.copy();
+  friction.mult(-1);
+  friction.normalize();
+  friction.mult(frictionMag);
+  velocity.add(friction);
+
+  // add velocity to avatar
+  position.add(velocity);
+
+  // speed limits
+  if (velocity.mag() > 1) {
+    velocity.setMag(1);
+  }
+  if (velocity.mag() < 0.005) {
+    velocity.setMag(0);
+  }
+  moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
+
 	// car movement
-	// if (keyIsDown(87)){
-		if(truck.rotationY<0){
-			rotationY = truck.rotationY%360 + 360;
-		}
-		else{
-			rotationY = truck.rotationY%360;
-		}
-		if(rotationY<=90 && rotationY>=0){
-			moveX = map(rotationY, 0, 90, moveSpeed, 0)
-			truck.nudge(0,0,moveX-moveSpeed);
-			fuelbox.nudge(0,0,moveX-moveSpeed)
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-      world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=180 && rotationY>90)){
-			moveX = map(rotationY, 90, 180, 0, moveSpeed)
-			truck.nudge(0,0,moveX-moveSpeed);
-			fuelbox.nudge(0,0,moveX-moveSpeed);
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-      world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=270 && rotationY>180)){
-			moveX = map(rotationY, 270, 180, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-      world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=360 && rotationY>270)){
-			moveX = map(rotationY, 270, 360, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-      world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-	// }
-	// if (keyIsDown(83)){
-	// 	if(truck.rotationY<0){
-	// 		rotationY = truck.rotationY%360 + 360;
-	// 	}
-	// 	else{
-	// 		rotationY = truck.rotationY%360;
-	// 	}
-	// 	if(rotationY<=90 && rotationY>=0){
-	// 		moveX = map(rotationY, 0, 90, moveSpeed, 0)
-	// 		truck.nudge(0,0,-(moveX-moveSpeed));
-	// 		fuelbox.nudge(0,0,-(moveX-moveSpeed));
-	// 		truck.nudge(-moveX,0,0);
-	// 		fuelbox.nudge(-moveX,0,0);
-	// 		// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-  //     world.setUserPosition(truck.x, 7, truck.z+10);
-	// 	}
-	// 	else if((rotationY<=180 && rotationY>90)){
-	// 		moveX = map(rotationY, 90, 180, 0, moveSpeed)
-	// 		truck.nudge(0,0,-(moveX-moveSpeed));
-	// 		fuelbox.nudge(0,0,-(moveX-moveSpeed));
-	// 		truck.nudge(moveX,0,0);
-	// 		fuelbox.nudge(moveX,0,0);
-	// 		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-  //     world.setUserPosition(truck.x, 7, truck.z+10);
-	// 	}
-	// 	else if((rotationY<=270 && rotationY>180)){
-	// 		moveX = map(rotationY, 270, 180, 0, moveSpeed)
-	// 		truck.nudge(0,0,(moveX-moveSpeed));
-	// 		fuelbox.nudge(0,0,(moveX-moveSpeed));
-	// 		truck.nudge(moveX,0,0);
-	// 		fuelbox.nudge(moveX,0,0);
-	// 		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-  //     world.setUserPosition(truck.x, 7, truck.z+10);
-	// 	}
-	// 	else if((rotationY<=360 && rotationY>270)){
-	// 		moveX = map(rotationY, 270, 360, 0, moveSpeed)
-	// 		truck.nudge(0,0,(moveX-moveSpeed));
-	// 		fuelbox.nudge(0,0,(moveX-moveSpeed));
-	// 		truck.nudge(-moveX,0,0);
-	// 		fuelbox.nudge(-moveX,0,0);
-	// 		// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-  //     world.setUserPosition(truck.x, 7, truck.z+10);
-	// 	}
-	// }
+	if(truck.rotationY<0){
+		rotationY = truck.rotationY%360 + 360;
+	}
+	else{
+		rotationY = truck.rotationY%360;
+	}
+	if(rotationY<=90 && rotationY>=0){
+		moveX = map(rotationY, 0, 90, moveSpeed, 0)
+		truck.nudge(0,0,moveX-moveSpeed);
+		fuelbox.nudge(0,0,moveX-moveSpeed)
+		truck.nudge(moveX,0,0);
+		fuelbox.nudge(moveX,0,0);
+		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+    world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=180 && rotationY>90)){
+		moveX = map(rotationY, 90, 180, 0, moveSpeed)
+		truck.nudge(0,0,moveX-moveSpeed);
+		fuelbox.nudge(0,0,moveX-moveSpeed);
+		truck.nudge(-moveX,0,0);
+		fuelbox.nudge(-moveX,0,0);
+		// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+    world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=270 && rotationY>180)){
+		moveX = map(rotationY, 270, 180, 0, moveSpeed)
+		truck.nudge(0,0,-(moveX-moveSpeed));
+		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+		truck.nudge(-moveX,0,0);
+		fuelbox.nudge(-moveX,0,0);
+		// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+    world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=360 && rotationY>270)){
+		moveX = map(rotationY, 270, 360, 0, moveSpeed)
+		truck.nudge(0,0,-(moveX-moveSpeed));
+		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+		truck.nudge(moveX,0,0);
+		fuelbox.nudge(moveX,0,0);
+		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+    world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+
 	if (keyIsDown(68)){
 		truck.spinY(-2);
 		fuelbox.spinY(-2);
