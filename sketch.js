@@ -35,6 +35,8 @@ let position, velocity;
 const frictionMag = 0.005;
 let friction;
 
+let allowMovement;
+
 function setup() {
 	// no canvas needed
 	noCanvas();
@@ -93,8 +95,12 @@ function setup() {
 	placeroad();
 	placefence();
 
-  // Adding a random cylinder to make it solid
+  // set up vectors to hold the user's position & accelration
+  position = createVector(0, -5);
+  velocity = createVector(0, 0);
 
+
+  // Adding a random cylinder to make it solid
   let grey = random(75,225);
   let xyz = new Box({
     x: 0,
@@ -103,17 +109,13 @@ function setup() {
     height: 4,
     red: grey, green: grey, blue: grey
   });
-
   // important -- set a property on the box to tell the system that this is
   // an entity that we can collide with!
   xyz.tag.object3D.userData.solid = true;
-
   // add the box to the world
   world.add(xyz);
-
-  // set up vectors to hold the user's position & accelration
-  position = createVector(0, -5);
-  velocity = createVector(0, 0);
+  sensor = new Sensor();
+  allowMovement = true;
 }
 
 function draw() {
@@ -139,6 +141,13 @@ function draw() {
 	if (fuelbox.getWidth() > 0) {
 		carMovement();
 	}
+
+  let objectAhead = sensor.getEntityInFrontOfUser();
+  console.log(objectAhead);
+  if (objectAhead && objectAhead.distance < 0.25 && objectAhead.object.el.object3D.userData.solid) {
+    allowMovement = false;
+  }
+
 }
 
 function placefence (){
@@ -217,6 +226,7 @@ function placeRoadBlocks(){
 }
 
 function carMovement () {
+  if(allowMovement == true){
   if (keyIsDown(65)) {
     //world.camera.nudgePosition(-moveSpeed, 0, 0);
     velocity.add(-accel, 0);
@@ -306,6 +316,7 @@ function carMovement () {
 		truck.spinY(2);
 		fuelbox.spinY(2);
 	}
+}
 }
 
 function placecar() {
@@ -458,6 +469,7 @@ function placefuel () {
 		scaleZ:0.04,
 		rotationY:-90
 	});
+  pump.tag.setAttribute('dynamic-Body', "shape: box; linearDamping:0.9; mass: 5000000");
 	// fuel park boundaries
 	let parking = new Plane ({
 		x:4, y:0.3, z:-24.9,
@@ -589,6 +601,7 @@ class Tree {
 			radiusBottom: 1.4, radiusTop: 0.01,
 			red: random(20, 40), green:random(120, 140), blue:0
 		});
+    this.stem.tag.object3D.userData.solid = true;
 
 		// add stem and leaves to container
 		// this.stem.tag.setAttribute('dynamic-Body');
@@ -649,6 +662,52 @@ class Particle {
 		}
 		else {
 			return "ok";
+		}
+	}
+}
+
+class Sensor {
+
+	constructor() {
+		// raycaster - think of this like a "beam" that will fire out of the
+		// bottom of the user's position to figure out what is below their avatar
+		this.rayCaster = new THREE.Raycaster();
+		this.userPosition = new THREE.Vector3(0,0,0);
+		this.downVector = new THREE.Vector3(0,-1,0);
+		this.intersects = [];
+
+		this.rayCasterFront = new THREE.Raycaster();
+		this.cursorPosition = new THREE.Vector2(0,0);
+		this.intersectsFront = [];
+	}
+
+	getEntityInFrontOfUser() {
+		// update the user's current position
+		// let cp = world.getUserPosition();
+		// this.userPosition.x = cp.x;
+		// this.userPosition.y = cp.y;
+		// this.userPosition.z = cp.z;
+    console.log(this.rayCasterFront);
+
+		// make sure the camera is ready to go
+		if (world.camera.cameraEl && world.camera.cameraEl.object3D && world.camera.cameraEl.object3D.children.length >= 2) {
+
+			// cast a ray in front of the user and see what's there
+			this.rayCasterFront.setFromCamera( this.cursorPosition, world.camera.cameraEl.object3D.children[1]);
+			this.intersectsFront = this.rayCasterFront.intersectObjects( world.threeSceneReference.children, true );
+
+			// determine which "solid" items are in front of the user
+			for (let i = 0; i < this.intersectsFront.length; i++) {
+				if (!this.intersectsFront[i].object.el.object3D.userData.solid) {
+					this.intersectsFront.splice(i,1);
+					i--;
+				}
+			}
+
+			if (this.intersectsFront.length > 0) {
+				return this.intersectsFront[0];
+			}
+			return false;
 		}
 	}
 }
