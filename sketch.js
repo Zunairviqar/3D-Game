@@ -68,17 +68,6 @@ function setup() {
 	world.add(sky);
 	// bgSound.setVolume(0.3);
 
-	// Grass field Model
-	field = new GLTF({
-		asset: 'field',
-		x: 0,
-		y: -0.6,
-		z: 0,
-		scaleX:2,
-		scaleY:2,
-		scaleZ:2
-	});
-
 	// add trees
 	for (let i = 0; i < 40; i++) {
 		trees.push(new Tree(random(10, 50), random(-40, 50), random(2.5, 3.3)));
@@ -98,7 +87,6 @@ function setup() {
   // set up vectors to hold the user's position & accelration
   position = createVector(0, -5);
   velocity = createVector(0, 0);
-
 
   // Adding a random cylinder to make it solid
   let grey = random(75,225);
@@ -134,19 +122,21 @@ function draw() {
 			i-=1;
 		}
 	}
-
-	if (frameCount % 1000 == 0 && fuelbox.getWidth() > 0.08){
+	console.log(fuelbox.getWidth())
+	if (frameCount % 200 == 0 && fuelbox.getWidth() >= 0.09){
 		fuelbox.setWidth(fuelbox.getWidth()-0.09);
 	}
-	if (fuelbox.getWidth() > 0) {
+	if (fuelbox.getWidth() > 0.01) {
 		carMovement();
 	}
 
-  let objectAhead = sensor.getEntityInFrontOfUser();
-  console.log(objectAhead);
-  if (objectAhead && objectAhead.distance < 0.25 && objectAhead.object.el.object3D.userData.solid) {
-    allowMovement = false;
-  }
+	console.log(truck.x, truck.z)
+
+	  let objectAhead = sensor.getEntityInFrontOfUser();
+	  // console.log(objectAhead);
+	  if (objectAhead && objectAhead.distance < 0.25 && objectAhead.object.el.object3D.userData.solid) {
+	    allowMovement = false;
+	  }
 
 }
 
@@ -161,16 +151,56 @@ function placefence (){
 	world.add(gate);
 
 	// fence Model
-	let cx = -25;
-	for (let i = 0; i < 3; i++){
-		let fence = new GLTF({
+	let cx = -25.6;
+	let bx = 17;
+	let fence;
+	for (let i = 0; i < 4; i++){
+		fence = new GLTF({
 			asset: 'fence',
 			x: cx,y: 0,z:-55,
 			scaleX:2,scaleY:2,scaleZ:2,
-			rotationY:70
+			rotationY:68
 		});
 		world.add(fence);
-		cx -= 10;
+		cx -= 8.3;
+		fence = new GLTF({
+			asset: 'fence',
+			x: bx,y: 0,z:-55,
+			scaleX:2,scaleY:2,scaleZ:2,
+			rotationY:68
+		});
+		world.add(fence);
+		bx += 8.3;
+	}
+	cz = - 95
+	for (let i = 0; i < 5; i++){
+		fence = new GLTF({
+			asset: 'fence',
+			x:-50 ,y: 0,z:cz,
+			scaleX:2,scaleY:2,scaleZ:2,
+			rotationY:-23
+		});
+		world.add(fence);
+		fence = new GLTF({
+			asset: 'fence',
+			x:50 ,y: 0,z:cz,
+			scaleX:2,scaleY:2,scaleZ:2,
+			rotationY:-23
+		});
+		world.add(fence);
+		cz += 8.3;
+	}
+
+	cx = -50;
+	for (let i = 0; i < 12; i++){
+		fence = new GLTF({
+			asset: 'fence',
+			x: cx,y: 0,z:-95,
+			scaleX:2,scaleY:2,scaleZ:2,
+			rotationY:68
+		});
+		world.add(fence);
+		cx += 8.5;
 	}
 }
 
@@ -469,17 +499,17 @@ function placefuel () {
 		scaleZ:0.04,
 		rotationY:-90
 	});
-  pump.tag.setAttribute('dynamic-Body', "shape: box; linearDamping:0.9; mass: 5000000");
+  	pump.tag.setAttribute('dynamic-Body', "shape: box; linearDamping:0.9; mass: 5000000");
 	// fuel park boundaries
 	let parking = new Plane ({
-		x:4, y:0.3, z:-24.9,
-		width:2.8, height:2.5,
+		x:3.7, y:0.3, z:-24.9,
+		width:2.4, height:2.5,
 		red:255, green:153, blue:153,
 		rotationX:-90
 	});
 	// Fuel button
 	let fuelbutton = new Cylinder ({
-		x: 6, y:4.5, z:-24.2,
+		x: 6.3, y:4, z:-24.2,
 		height: 0.03,
 		radius: 0.2,
 		red: 0, green:255, blue:0,
@@ -494,11 +524,10 @@ function placefuel () {
 		},
 		clickFunction:  function(entity) {
 			console.log(truck.x, truck.z)
-			if (truck.x >= 3.75 &&
-				truck.x <= 4.60 &&
-				truck.z <= -23.8 &&
-				truck.z >= -25.25) {
-
+			if (truck.x >= 3.2 &&
+				truck.x <= 4.8 &&
+				truck.z <= -23.6 &&
+				truck.z >= -25.3) {
 					fuelbox.setWidth(0.9);
 			}
 
@@ -510,7 +539,7 @@ function placefuel () {
 		text: 'FILL',
 		red: 0, green: 51, blue: 0,
 		side: 'double',
-		x: 6, y: 4.5, z: -24.16,
+		x: 6.3, y: 4, z: -24.16,
 		scaleX: 4, scaleY: 4, scaleZ: 4
 	});
 
