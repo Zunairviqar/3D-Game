@@ -526,8 +526,8 @@ function placebowling () {
 		// rotationY:30
 	});
 
-	ball.tag.setAttribute('dynamic-Body', "shape: sphere; radius:15; mass: 50");
-  // bowling.tag.setAttribute('dynamic-Body', "shape: cylinder; radiusTop: 0.05; radiusBottom: 0.05; cylinderAxis: y; mass: 25");
+  ball.tag.setAttribute('body', "type: dynamic; mass: 5; shape: none;");
+  ball.tag.setAttribute('shape__main', "shape: sphere; radius:1.4;");
 
 	world.add(ball);
 }
