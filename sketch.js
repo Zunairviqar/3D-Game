@@ -154,6 +154,7 @@ function draw() {
 			i-=1;
 		}
 	}
+	cointext.setText(collections)
 
 }
 
@@ -273,6 +274,7 @@ function placeRoadBlocks(){
 }
 
 function carMovement () {
+
   	if(allowMovement == true){
 		if (keyIsDown(65)) {
 		//world.camera.nudgePosition(-moveSpeed, 0, 0);
@@ -322,8 +324,10 @@ function carMovement () {
 			moveX = map(rotationY, 0, 90, moveSpeed, 0)
 			truck.nudge(0,0,moveX-moveSpeed);
 			fuelbox.nudge(0,0,moveX-moveSpeed)
+			cointext.nudge(0,0,moveX-moveSpeed)
 			truck.nudge(moveX,0,0);
 			fuelbox.nudge(moveX,0,0);
+			cointext.nudge(moveX,0,0);
 			// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
 	    	world.setUserPosition(truck.x, 7, truck.z+10);
 		}
@@ -331,8 +335,10 @@ function carMovement () {
 			moveX = map(rotationY, 90, 180, 0, moveSpeed)
 			truck.nudge(0,0,moveX-moveSpeed);
 			fuelbox.nudge(0,0,moveX-moveSpeed);
+			cointext.nudge(0,0,moveX-moveSpeed);
 			truck.nudge(-moveX,0,0);
 			fuelbox.nudge(-moveX,0,0);
+			cointext.nudge(-moveX,0,0);
 			// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
 	    	world.setUserPosition(truck.x, 7, truck.z+10);
 		}
@@ -340,8 +346,10 @@ function carMovement () {
 			moveX = map(rotationY, 270, 180, 0, moveSpeed)
 			truck.nudge(0,0,-(moveX-moveSpeed));
 			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			cointext.nudge(0,0,-(moveX-moveSpeed));
 			truck.nudge(-moveX,0,0);
 			fuelbox.nudge(-moveX,0,0);
+			cointext.nudge(-moveX,0,0);
 			// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
 	    	world.setUserPosition(truck.x, 7, truck.z+10);
 		}
@@ -349,8 +357,10 @@ function carMovement () {
 			moveX = map(rotationY, 270, 360, 0, moveSpeed)
 			truck.nudge(0,0,-(moveX-moveSpeed));
 			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			cointext.nudge(0,0,-(moveX-moveSpeed));
 			truck.nudge(moveX,0,0);
 			fuelbox.nudge(moveX,0,0);
+			cointext.nudge(moveX,0,0);
 			// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
 	    	world.setUserPosition(truck.x, 7, truck.z+10);
 		}
@@ -358,10 +368,12 @@ function carMovement () {
 		if (keyIsDown(68)){
 			truck.spinY(-2);
 			fuelbox.spinY(-2);
+			cointext.spinY(-2);
 		}
 		if (keyIsDown(65)){
 			truck.spinY(2);
 			fuelbox.spinY(2);
+			cointext.spinY(2);
 		}
 	}
 }
@@ -394,8 +406,8 @@ function placecar() {
 		text: collections,
 		red: 128, green: 64, blue: 0,
 		side: 'double',
-		x: carX, y: 3, z: carZ,
-		scaleX: 4, scaleY: 4, scaleZ: 4
+		x: carX, y: 2.3, z: carZ,
+		scaleX: 6, scaleY: 6, scaleZ: 6
 	});
 
 	world.add(cointext);
@@ -613,7 +625,7 @@ class Coin {
 		}
 		else if (dist(truck.x, truck.z, this.coin.x, this.coin.z) <= 2){
 			collections += 1
-			cointext.setText(collections)
+
 			world.remove(this.coin)
 			return "gone"
 		}
