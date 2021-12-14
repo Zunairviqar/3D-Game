@@ -61,8 +61,6 @@ function setup() {
 	// rotate the camera down at an angle
 	world.camera.holder.object3D.rotation.set(radians(-15), 0, 0);
 
-	fuel = 100;
-
 	// add sky
 	sky = new Sky({
 		asset: 'sky'
@@ -81,7 +79,7 @@ function setup() {
 	placebrick();
 	placelamps();
 	placecar();
-	// placeRoadBlocks();
+	placeRoadBlocks();
 	playground();
 	placeroad();
 	placefence();
@@ -248,11 +246,11 @@ function placeroad (){
 function placeRoadBlocks(){
 	let rblock = new GLTF({
 		asset: 'rblock',
-		x: 1,y: 1.5,z:-15,
-		scaleX:2, scaleY:2,scaleZ:2,
-		rotationY:-47
+		x: 0,y: 0, z:-15,
+		scaleX:0.03, scaleY:0.03,scaleZ:0.03,
+		rotationY: -5
 	});
-	// console.log("road blokkk")
+	rblock.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 	world.add(rblock)
 }
 
@@ -377,7 +375,7 @@ function placecar() {
 	});
 	// Fuel bar
 	fuelbox = new Box({
-		x:carX, y:2, z:carZ,
+		x:carX, y:2.6, z:carZ,
 		width:0.9, height: 0.1, depth: 0.05,
 		red:255, green:0, blue:0,
 	});
@@ -387,7 +385,7 @@ function placecar() {
 		text: collections,
 		red: 255, green: 255, blue:102,
 		side: 'double',
-		x: carX, y: 2.3, z: carZ,
+		x: carX, y: 2.9, z: carZ,
 		scaleX: 8, scaleY: 8, scaleZ: 8
 	});
 
@@ -425,7 +423,7 @@ function placelamps() {
 			scaleX:0.003,
 			scaleY:0.003,
 			scaleZ:0.003,
-			rotationY:-90
+			rotationY:-180
 		})
 		world.add(light)
 		lights.push(light)
@@ -661,9 +659,9 @@ class BowlingPins {
 			scaleZ:0.0015
 			// rotationY:30
 		});
-    bowling.tag.setAttribute('dynamic-Body', "shape: cylinder; radiusTop: 0.05; radiusBottom: 0.05; cylinderAxis: y; mass: 25");
+   		bowling.tag.setAttribute('dynamic-Body', "shape: cylinder; radiusTop: 0.05; radiusBottom: 0.05; cylinderAxis: y; mass: 25");
 		world.add(bowling);
-		}
+	}
 }
 
 // tree class
