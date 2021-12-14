@@ -39,10 +39,28 @@ let position, velocity;
 const frictionMag = 0.005;
 let friction;
 
+// sound
+let carDrive, honk, click, bricks, collision, fence, coinCol, rain;
+
+// load sounds
+function preload() {
+	rain = loadSound("sounds/rain.mp3");
+	carDrive = loadSound("sounds/car.mp3");
+	honk = loadSound("sounds/honk.mp3");
+	coinCol = loadSound("sounds/collection.wav")
+	click = loadSound("sounds/clicked.wav");
+	// to be added
+	bricks = loadSound("sounds/bricks.mp3");
+	collision = loadSound("sounds/collision.mp3");
+	fence = loadSound("sounds/fence.mp3");
+}
+
+
 function setup() {
 	// no canvas needed
 	noCanvas();
-
+	rain.setVolume(0.2)
+	carDrive.setVolume(0.07)
 	// construct the A-Frame world
 	// this function requires a reference to the ID of the 'a-scene' tag in our HTML document
 	world = new World('VRScene');
@@ -252,26 +270,63 @@ function placeRoadBlocks(){
 	});
 	rblock.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 	world.add(rblock)
+
+	// fuel text
+	let movetext = new Text({
+		text: 'WASD to move',
+		red: 51, green: 51, blue: 204,
+		side: 'double',
+		x: 0, y: 0.5, z: 3,
+		scaleX: 22, scaleY: 22, scaleZ: 22,
+		rotationX: -90
+	});
+
+	world.add(movetext);
+
+	// fuel text
+	let honktext = new Text({
+		text: 'H to honk',
+		red: 51, green: 51, blue: 204,
+		side: 'double',
+		x: 0, y: 0.5, z: 4.5,
+		scaleX: 18, scaleY: 18, scaleZ: 18,
+		rotationX: -90
+	});
+
+	world.add(honktext);
 }
 
 function carMovement () {
+	// if (moveX == 0)
 
 	if (keyIsDown(65)) {
-	//world.camera.nudgePosition(-moveSpeed, 0, 0);
-	velocity.add(-accel, 0);
+		if(!carDrive.isPlaying()){
+			carDrive.play()
+		}
+		//world.camera.nudgePosition(-moveSpeed, 0, 0);
+		velocity.add(-accel, 0);
 	}
 	if (keyIsDown(68)) {
-	//world.camera.nudgePosition(moveSpeed, 0, 0);
-	velocity.add(accel, 0);
+		if(!carDrive.isPlaying()){
+			carDrive.play()
+		}
+		//world.camera.nudgePosition(moveSpeed, 0, 0);
+		velocity.add(accel, 0);
 	}
 
 	if (keyIsDown(87)) {
-	//world.camera.nudgePosition(0, 0, -moveSpeed);
-	velocity.add(0, -accel);
+		if(!carDrive.isPlaying()){
+			carDrive.play()
+		}
+		//world.camera.nudgePosition(0, 0, -moveSpeed);
+		velocity.add(0, -accel);
 	}
 	if (keyIsDown(83)) {
-	//world.camera.nudgePosition(0, 0, moveSpeed);
-	velocity.add(0, accel);
+		if(!carDrive.isPlaying()){
+			carDrive.play()
+		}
+		//world.camera.nudgePosition(0, 0, moveSpeed);
+		velocity.add(0, accel);
 	}
 
 	// apply friction
@@ -394,7 +449,7 @@ function placecar() {
 	world.add(fuelbox);
 	// Making the truck collidable with other objects
 	truck.tag.setAttribute('static-Body', "shape: box; mass: 100");
-  truck.tag.setAttribute('kinematic-Body', true);
+  	truck.tag.setAttribute('kinematic-Body', true);
 
 	world.add(truck);
 }
@@ -543,16 +598,18 @@ function placefuel () {
 			theBox.setColor(0, 255, 0);
 		},
 		clickFunction:  function(entity) {
-			if (truck.x >= 3.2 &&
+			console.log(truck.x, truck.z)
+			if (truck.x >= 3 &&
 				truck.x <= 4.8 &&
-				truck.z <= -23.6 &&
-				truck.z >= -25.3 &&
-				collections >= 2) {
-					fuelbox.setWidth(0.9);
-					collections -=2;
+				truck.z <= -23 &&
+				truck.z >= -25 &&
+				collections >= 0) {
+				fuelbox.setWidth(0.9);
+				collections -=2;
+				click.play()
 			}
 
-		},
+		}
 	})
 
 	// fuel text
@@ -607,7 +664,7 @@ class Coin {
 		}
 		else if (dist(truck.x, truck.z, this.coin.x, this.coin.z) <= 2){
 			collections += 1
-
+			coinCol.play()
 			world.remove(this.coin)
 			return "gone"
 		}
@@ -745,5 +802,15 @@ class Particle {
 		else {
 			return "ok";
 		}
+	}
+}
+
+// play sound
+function keyPressed(){
+	if(!rain.isPlaying()){
+		rain.loop();
+	}
+	if (keyCode == 72){
+		honk.play()
 	}
 }
