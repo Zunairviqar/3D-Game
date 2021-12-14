@@ -501,7 +501,7 @@ function placebowling () {
 		// rotationY:30
 	});
 
-  ball.tag.setAttribute('body', "type: dynamic; mass: 5; shape: none;");
+  ball.tag.setAttribute('body', "type: dynamic; mass: 50; shape: none;");
   ball.tag.setAttribute('shape__main', "shape: sphere; radius:1.4;");
 
 	world.add(ball);
