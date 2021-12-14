@@ -404,10 +404,10 @@ function placecar() {
 	// coin text
 	cointext = new Text({
 		text: collections,
-		red: 128, green: 64, blue: 0,
+		red: 255, green: 255, blue:102,
 		side: 'double',
 		x: carX, y: 2.3, z: carZ,
-		scaleX: 6, scaleY: 6, scaleZ: 6
+		scaleX: 8, scaleY: 8, scaleZ: 8
 	});
 
 	world.add(cointext);
@@ -566,8 +566,10 @@ function placefuel () {
 			if (truck.x >= 3.2 &&
 				truck.x <= 4.8 &&
 				truck.z <= -23.6 &&
-				truck.z >= -25.3) {
+				truck.z >= -25.3 &&
+				collections >= 2) {
 					fuelbox.setWidth(0.9);
+					collections -=2;
 			}
 
 		},
