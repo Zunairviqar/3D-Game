@@ -166,6 +166,7 @@ function placefence (){
 		scaleX:2,scaleY:2,scaleZ:2,
 		rotationY:90
 	});
+	gate.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 	world.add(gate);
 
 	// fence Model
@@ -179,6 +180,7 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:68
 		});
+		fence.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 		world.add(fence);
 		cx -= 8.3;
 		fence = new GLTF({
@@ -187,6 +189,7 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:68
 		});
+		fence.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 		world.add(fence);
 		bx += 8.3;
 	}
@@ -198,6 +201,7 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:-23
 		});
+		fence.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 		world.add(fence);
 		fence = new GLTF({
 			asset: 'fence',
@@ -205,6 +209,7 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:-23
 		});
+		fence.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 		world.add(fence);
 		cz += 8.3;
 	}
@@ -217,6 +222,7 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:68
 		});
+		fence.tag.setAttribute('dynamic-Body', "mass: 80");
 		world.add(fence);
 		cx += 8.5;
 	}
