@@ -39,8 +39,6 @@ let position, velocity;
 const frictionMag = 0.005;
 let friction;
 
-let allowMovement;
-
 function setup() {
 	// no canvas needed
 	noCanvas();
@@ -92,22 +90,6 @@ function setup() {
   position = createVector(0, -5);
   velocity = createVector(0, 0);
 
-  // Adding a random cylinder to make it solid
-  let grey = random(75,225);
-  let xyz = new Box({
-    x: 0,
-    y: 2,
-    z: -10,
-    height: 4,
-    red: grey, green: grey, blue: grey
-  });
-  // important -- set a property on the box to tell the system that this is
-  // an entity that we can collide with!
-  xyz.tag.object3D.userData.solid = true;
-  // add the box to the world
-  world.add(xyz);
-  sensor = new Sensor();
-  allowMovement = true;
 }
 
 function draw() {
@@ -126,7 +108,7 @@ function draw() {
 			i-=1;
 		}
 	}
-	console.log(fuelbox.getWidth())
+	// console.log(fuelbox.getWidth())
 	if (frameCount % 200 == 0 && fuelbox.getWidth() >= 0.09){
 		fuelbox.setWidth(fuelbox.getWidth()-0.09);
 	}
@@ -134,13 +116,7 @@ function draw() {
 		carMovement();
 	}
 
-	console.log(truck.x, truck.z)
-
-	  let objectAhead = sensor.getEntityInFrontOfUser();
-	  // console.log(objectAhead);
-	  if (objectAhead && objectAhead.distance < 0.25 && objectAhead.object.el.object3D.userData.solid) {
-	    allowMovement = false;
-	  }
+	// console.log(truck.x, truck.z)
 
 	// add coins
 	if (frameCount % 100 == 0){
@@ -166,7 +142,7 @@ function placefence (){
 		scaleX:2,scaleY:2,scaleZ:2,
 		rotationY:90
 	});
-	gate.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
+	// gate.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
 	world.add(gate);
 
 	// fence Model
@@ -275,112 +251,110 @@ function placeRoadBlocks(){
 		scaleX:2, scaleY:2,scaleZ:2,
 		rotationY:-47
 	});
-	console.log("road blokkk")
+	// console.log("road blokkk")
 	world.add(rblock)
 }
 
 function carMovement () {
 
-  	if(allowMovement == true){
-		if (keyIsDown(65)) {
-		//world.camera.nudgePosition(-moveSpeed, 0, 0);
-		velocity.add(-accel, 0);
-		}
-		if (keyIsDown(68)) {
-		//world.camera.nudgePosition(moveSpeed, 0, 0);
-		velocity.add(accel, 0);
-		}
+	if (keyIsDown(65)) {
+	//world.camera.nudgePosition(-moveSpeed, 0, 0);
+	velocity.add(-accel, 0);
+	}
+	if (keyIsDown(68)) {
+	//world.camera.nudgePosition(moveSpeed, 0, 0);
+	velocity.add(accel, 0);
+	}
 
-		if (keyIsDown(87)) {
-		//world.camera.nudgePosition(0, 0, -moveSpeed);
-		velocity.add(0, -accel);
-		}
-		if (keyIsDown(83)) {
-		//world.camera.nudgePosition(0, 0, moveSpeed);
-		velocity.add(0, accel);
-		}
+	if (keyIsDown(87)) {
+	//world.camera.nudgePosition(0, 0, -moveSpeed);
+	velocity.add(0, -accel);
+	}
+	if (keyIsDown(83)) {
+	//world.camera.nudgePosition(0, 0, moveSpeed);
+	velocity.add(0, accel);
+	}
 
-		// apply friction
-		friction = velocity.copy();
-		friction.mult(-1);
-		friction.normalize();
-		friction.mult(frictionMag);
-		velocity.add(friction);
+	// apply friction
+	friction = velocity.copy();
+	friction.mult(-1);
+	friction.normalize();
+	friction.mult(frictionMag);
+	velocity.add(friction);
 
-		// add velocity to avatar
-		position.add(velocity);
+	// add velocity to avatar
+	position.add(velocity);
 
-		// speed limits
-		if (velocity.mag() > 1) {
-		velocity.setMag(1);
-		}
-		if (velocity.mag() < 0.005) {
-		velocity.setMag(0);
-		}
-		moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
+	// speed limits
+	if (velocity.mag() > 1) {
+	velocity.setMag(1);
+	}
+	if (velocity.mag() < 0.005) {
+	velocity.setMag(0);
+	}
+	moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
 
-		// car movement
-		if(truck.rotationY<0){
-			rotationY = truck.rotationY%360 + 360;
-		}
-		else{
-			rotationY = truck.rotationY%360;
-		}
-		if(rotationY<=90 && rotationY>=0){
-			moveX = map(rotationY, 0, 90, moveSpeed, 0)
-			truck.nudge(0,0,moveX-moveSpeed);
-			fuelbox.nudge(0,0,moveX-moveSpeed)
-			cointext.nudge(0,0,moveX-moveSpeed)
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			cointext.nudge(moveX,0,0);
-			// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-	    	world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=180 && rotationY>90)){
-			moveX = map(rotationY, 90, 180, 0, moveSpeed)
-			truck.nudge(0,0,moveX-moveSpeed);
-			fuelbox.nudge(0,0,moveX-moveSpeed);
-			cointext.nudge(0,0,moveX-moveSpeed);
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			cointext.nudge(-moveX,0,0);
-			// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-	    	world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=270 && rotationY>180)){
-			moveX = map(rotationY, 270, 180, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			cointext.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(-moveX,0,0);
-			fuelbox.nudge(-moveX,0,0);
-			cointext.nudge(-moveX,0,0);
-			// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-	    	world.setUserPosition(truck.x, 7, truck.z+10);
-		}
-		else if((rotationY<=360 && rotationY>270)){
-			moveX = map(rotationY, 270, 360, 0, moveSpeed)
-			truck.nudge(0,0,-(moveX-moveSpeed));
-			fuelbox.nudge(0,0,-(moveX-moveSpeed));
-			cointext.nudge(0,0,-(moveX-moveSpeed));
-			truck.nudge(moveX,0,0);
-			fuelbox.nudge(moveX,0,0);
-			cointext.nudge(moveX,0,0);
-			// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-	    	world.setUserPosition(truck.x, 7, truck.z+10);
-		}
+	// car movement
+	if(truck.rotationY<0){
+		rotationY = truck.rotationY%360 + 360;
+	}
+	else{
+		rotationY = truck.rotationY%360;
+	}
+	if(rotationY<=90 && rotationY>=0){
+		moveX = map(rotationY, 0, 90, moveSpeed, 0)
+		truck.nudge(0,0,moveX-moveSpeed);
+		fuelbox.nudge(0,0,moveX-moveSpeed)
+		cointext.nudge(0,0,moveX-moveSpeed)
+		truck.nudge(moveX,0,0);
+		fuelbox.nudge(moveX,0,0);
+		cointext.nudge(moveX,0,0);
+		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+    	world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=180 && rotationY>90)){
+		moveX = map(rotationY, 90, 180, 0, moveSpeed)
+		truck.nudge(0,0,moveX-moveSpeed);
+		fuelbox.nudge(0,0,moveX-moveSpeed);
+		cointext.nudge(0,0,moveX-moveSpeed);
+		truck.nudge(-moveX,0,0);
+		fuelbox.nudge(-moveX,0,0);
+		cointext.nudge(-moveX,0,0);
+		// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+    	world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=270 && rotationY>180)){
+		moveX = map(rotationY, 270, 180, 0, moveSpeed)
+		truck.nudge(0,0,-(moveX-moveSpeed));
+		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+		cointext.nudge(0,0,-(moveX-moveSpeed));
+		truck.nudge(-moveX,0,0);
+		fuelbox.nudge(-moveX,0,0);
+		cointext.nudge(-moveX,0,0);
+		// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+    	world.setUserPosition(truck.x, 7, truck.z+10);
+	}
+	else if((rotationY<=360 && rotationY>270)){
+		moveX = map(rotationY, 270, 360, 0, moveSpeed)
+		truck.nudge(0,0,-(moveX-moveSpeed));
+		fuelbox.nudge(0,0,-(moveX-moveSpeed));
+		cointext.nudge(0,0,-(moveX-moveSpeed));
+		truck.nudge(moveX,0,0);
+		fuelbox.nudge(moveX,0,0);
+		cointext.nudge(moveX,0,0);
+		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+    	world.setUserPosition(truck.x, 7, truck.z+10);
+	}
 
-		if (keyIsDown(68)){
-			truck.spinY(-2);
-			fuelbox.spinY(-2);
-			cointext.spinY(-2);
-		}
-		if (keyIsDown(65)){
-			truck.spinY(2);
-			fuelbox.spinY(2);
-			cointext.spinY(2);
-		}
+	if (keyIsDown(68)){
+		truck.spinY(-2);
+		fuelbox.spinY(-2);
+		cointext.spinY(-2);
+	}
+	if (keyIsDown(65)){
+		truck.spinY(2);
+		fuelbox.spinY(2);
+		cointext.spinY(2);
 	}
 }
 
@@ -421,6 +395,8 @@ function placecar() {
 	world.add(fuelbox);
 	// Making the truck collidable with other objects
 	truck.tag.setAttribute('static-Body', "shape: box; mass: 100");
+  truck.tag.setAttribute('kinematic-Body', true);
+
 	world.add(truck);
 }
 
@@ -544,7 +520,7 @@ function placefuel () {
 		scaleZ:0.04,
 		rotationY:-90
 	});
-  	pump.tag.setAttribute('dynamic-Body', "shape: box; linearDamping:0.9; mass: 5000000");
+  	pump.tag.setAttribute('static-Body',"shape: box; linearDamping:0.9; mass: 5000000");
 	// fuel park boundaries
 	let parking = new Plane ({
 		x:3.7, y:0.3, z:-24.9,
@@ -568,7 +544,6 @@ function placefuel () {
 			theBox.setColor(0, 255, 0);
 		},
 		clickFunction:  function(entity) {
-			console.log(truck.x, truck.z)
 			if (truck.x >= 3.2 &&
 				truck.x <= 4.8 &&
 				truck.z <= -23.6 &&
@@ -601,13 +576,13 @@ function keyPressed(){
 	if (keyCode == 66){
 		reset = true
 		// for (let i = 0; i < boxes.length; i++){
-			console.log("currX " + boxes[0].box.x)
+			// console.log("currX " + boxes[0].box.x)
 			boxes[0].box.x = boxes[0].px;
-			console.log("newX " + boxes[0].box.x)
+			// console.log("newX " + boxes[0].box.x)
 			boxes[0].box.y = boxes[0].py;
-			console.log("newy " + boxes[0].box.x)
+			// console.log("newy " + boxes[0].box.x)
 			boxes[0].box.z = boxes[0].pz;
-			console.log("newz " + boxes[0].box.x)
+			// console.log("newz " + boxes[0].box.x)
 	}
 }
 
@@ -712,7 +687,7 @@ class Tree {
     this.stem.tag.object3D.userData.solid = true;
 
 		// add stem and leaves to container
-		// this.stem.tag.setAttribute('dynamic-Body');
+		this.stem.tag.setAttribute('static-Body', true);
 		// this.leaves.tag.setAttribute('dynamic-Body');
 		world.add(this.stem);
 		world.add(this.leaves);
@@ -770,52 +745,6 @@ class Particle {
 		}
 		else {
 			return "ok";
-		}
-	}
-}
-
-class Sensor {
-
-	constructor() {
-		// raycaster - think of this like a "beam" that will fire out of the
-		// bottom of the user's position to figure out what is below their avatar
-		this.rayCaster = new THREE.Raycaster();
-		this.userPosition = new THREE.Vector3(0,0,0);
-		this.downVector = new THREE.Vector3(0,-1,0);
-		this.intersects = [];
-
-		this.rayCasterFront = new THREE.Raycaster();
-		this.cursorPosition = new THREE.Vector2(0,0);
-		this.intersectsFront = [];
-	}
-
-	getEntityInFrontOfUser() {
-		// update the user's current position
-		// let cp = world.getUserPosition();
-		// this.userPosition.x = cp.x;
-		// this.userPosition.y = cp.y;
-		// this.userPosition.z = cp.z;
-    console.log(this.rayCasterFront);
-
-		// make sure the camera is ready to go
-		if (world.camera.cameraEl && world.camera.cameraEl.object3D && world.camera.cameraEl.object3D.children.length >= 2) {
-
-			// cast a ray in front of the user and see what's there
-			this.rayCasterFront.setFromCamera( this.cursorPosition, world.camera.cameraEl.object3D.children[1]);
-			this.intersectsFront = this.rayCasterFront.intersectObjects( world.threeSceneReference.children, true );
-
-			// determine which "solid" items are in front of the user
-			for (let i = 0; i < this.intersectsFront.length; i++) {
-				if (!this.intersectsFront[i].object.el.object3D.userData.solid) {
-					this.intersectsFront.splice(i,1);
-					i--;
-				}
-			}
-
-			if (this.intersectsFront.length > 0) {
-				return this.intersectsFront[0];
-			}
-			return false;
 		}
 	}
 }
