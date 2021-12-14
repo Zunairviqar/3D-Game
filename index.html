@@ -33,7 +33,7 @@
 	<body>
 
 		<!-- container to hold our VR scene - make sure to give this element an ID of 'VRScene' -->
-	    <a-scene physics="debug: true; gravity: -9.8; restitution: 0.7;" id="VRScene">
+	    <a-scene physics="gravity: -9.8; friction: 0.05; restitution: 0.1;" id="VRScene">
 
 				<a-assets id="VRAssets" timeout="90000">
 					<img src="images/iron_block.png" id="iron">

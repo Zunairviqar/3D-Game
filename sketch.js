@@ -156,7 +156,8 @@ function placefence (){
 			scaleX:2,scaleY:2,scaleZ:2,
 			rotationY:68
 		});
-		fence.tag.setAttribute('dynamic-Body', "linearDamping: 0.5; mass: 10");
+    fence.spinY(-5);
+		fence.tag.setAttribute('dynamic-Body', "shape: box; halfExtents: 0.05 0.05 0.02; mass: 0.5");
 		world.add(fence);
 		cx -= 8.3;
 		fence = new GLTF({
@@ -446,7 +447,7 @@ function placebrick () {
 			if (total >= 2 && i < total-1){
 				boxes.push(new Cube(cx+0.5, cy+0.5, cz))
 			}
-			cx += 0.9;
+			cx += 1;
 		}
 	}
 
@@ -457,9 +458,9 @@ function placebrick () {
 		for (let i = 0; i < 5; i++) {
 			// first layer of boxes
 			boxes.push(new Cube(cx, cy, cz));
-			cx+=0.9
+			cx+=1
 		}
-		cy += 0.5
+		cy += 1
 	}
 
 	cy = 0.25;
@@ -469,9 +470,9 @@ function placebrick () {
 		for (let i = 0; i < 6; i++) {
 			// first layer of boxes
 			boxes.push(new Cube(cx, cy, cz));
-			cz+=0.9
+			cz+=1.3
 		}
-		cy += 0.5
+		cy += 1 + 0.0001*i
 	}
 }
 
@@ -625,7 +626,7 @@ class Cube {
 		this.box = new Box({
 
 			x:x, y:y, z:z,
-			width:0.9, height: 0.5, depth: 0.5,
+			width:1, height: 1, depth: 1,
 			// iron asset
 			asset: 'iron',
 			red:255, green:217, blue:179,
@@ -688,7 +689,7 @@ class Tree {
 
 		// add stem and leaves to container
 		this.stem.tag.setAttribute('static-Body', true);
-		// this.leaves.tag.setAttribute('dynamic-Body');
+		this.leaves.tag.setAttribute('static-Body', true);
 		world.add(this.stem);
 		world.add(this.leaves);
 	}
