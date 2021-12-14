@@ -3,7 +3,7 @@ let carX, carZ;
 let car;
 let moveSpeed;
 let world;
-let truck, fuelbox;
+let truck, fuelbox, cointext;
 
 let trees = [];
 let boxes = [];
@@ -26,6 +26,10 @@ let bowling;
 let fuel;
 
 let particles = [];
+
+let coins = [];
+
+let collections = 0;
 
 // user position & velocity
 const accel = 0.01;
@@ -137,6 +141,19 @@ function draw() {
 	  if (objectAhead && objectAhead.distance < 0.25 && objectAhead.object.el.object3D.userData.solid) {
 	    allowMovement = false;
 	  }
+
+	// add coins
+	if (frameCount % 100 == 0){
+		coins.push(new Coin())
+	}
+	// remove coins
+	for (var i = 0; i < coins.length; i++) {
+		var result = coins[i].destroy();
+		if (result == "gone") {
+			coins.splice(i, 1);
+			i-=1;
+		}
+	}
 
 }
 
@@ -256,97 +273,97 @@ function placeRoadBlocks(){
 }
 
 function carMovement () {
-  if(allowMovement == true){
-  if (keyIsDown(65)) {
-    //world.camera.nudgePosition(-moveSpeed, 0, 0);
-    velocity.add(-accel, 0);
-  }
-  if (keyIsDown(68)) {
-    //world.camera.nudgePosition(moveSpeed, 0, 0);
-    velocity.add(accel, 0);
-  }
+  	if(allowMovement == true){
+		if (keyIsDown(65)) {
+		//world.camera.nudgePosition(-moveSpeed, 0, 0);
+		velocity.add(-accel, 0);
+		}
+		if (keyIsDown(68)) {
+		//world.camera.nudgePosition(moveSpeed, 0, 0);
+		velocity.add(accel, 0);
+		}
 
-  if (keyIsDown(87)) {
-    //world.camera.nudgePosition(0, 0, -moveSpeed);
-    velocity.add(0, -accel);
-  }
-  if (keyIsDown(83)) {
-    //world.camera.nudgePosition(0, 0, moveSpeed);
-    velocity.add(0, accel);
-  }
+		if (keyIsDown(87)) {
+		//world.camera.nudgePosition(0, 0, -moveSpeed);
+		velocity.add(0, -accel);
+		}
+		if (keyIsDown(83)) {
+		//world.camera.nudgePosition(0, 0, moveSpeed);
+		velocity.add(0, accel);
+		}
 
-  // apply friction
-  friction = velocity.copy();
-  friction.mult(-1);
-  friction.normalize();
-  friction.mult(frictionMag);
-  velocity.add(friction);
+		// apply friction
+		friction = velocity.copy();
+		friction.mult(-1);
+		friction.normalize();
+		friction.mult(frictionMag);
+		velocity.add(friction);
 
-  // add velocity to avatar
-  position.add(velocity);
+		// add velocity to avatar
+		position.add(velocity);
 
-  // speed limits
-  if (velocity.mag() > 1) {
-    velocity.setMag(1);
-  }
-  if (velocity.mag() < 0.005) {
-    velocity.setMag(0);
-  }
-  moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
+		// speed limits
+		if (velocity.mag() > 1) {
+		velocity.setMag(1);
+		}
+		if (velocity.mag() < 0.005) {
+		velocity.setMag(0);
+		}
+		moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
 
-	// car movement
-	if(truck.rotationY<0){
-		rotationY = truck.rotationY%360 + 360;
-	}
-	else{
-		rotationY = truck.rotationY%360;
-	}
-	if(rotationY<=90 && rotationY>=0){
-		moveX = map(rotationY, 0, 90, moveSpeed, 0)
-		truck.nudge(0,0,moveX-moveSpeed);
-		fuelbox.nudge(0,0,moveX-moveSpeed)
-		truck.nudge(moveX,0,0);
-		fuelbox.nudge(moveX,0,0);
-		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
-    world.setUserPosition(truck.x, 7, truck.z+10);
-	}
-	else if((rotationY<=180 && rotationY>90)){
-		moveX = map(rotationY, 90, 180, 0, moveSpeed)
-		truck.nudge(0,0,moveX-moveSpeed);
-		fuelbox.nudge(0,0,moveX-moveSpeed);
-		truck.nudge(-moveX,0,0);
-		fuelbox.nudge(-moveX,0,0);
-		// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
-    world.setUserPosition(truck.x, 7, truck.z+10);
-	}
-	else if((rotationY<=270 && rotationY>180)){
-		moveX = map(rotationY, 270, 180, 0, moveSpeed)
-		truck.nudge(0,0,-(moveX-moveSpeed));
-		fuelbox.nudge(0,0,-(moveX-moveSpeed));
-		truck.nudge(-moveX,0,0);
-		fuelbox.nudge(-moveX,0,0);
-		// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
-    world.setUserPosition(truck.x, 7, truck.z+10);
-	}
-	else if((rotationY<=360 && rotationY>270)){
-		moveX = map(rotationY, 270, 360, 0, moveSpeed)
-		truck.nudge(0,0,-(moveX-moveSpeed));
-		fuelbox.nudge(0,0,-(moveX-moveSpeed));
-		truck.nudge(moveX,0,0);
-		fuelbox.nudge(moveX,0,0);
-		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
-    world.setUserPosition(truck.x, 7, truck.z+10);
-	}
+		// car movement
+		if(truck.rotationY<0){
+			rotationY = truck.rotationY%360 + 360;
+		}
+		else{
+			rotationY = truck.rotationY%360;
+		}
+		if(rotationY<=90 && rotationY>=0){
+			moveX = map(rotationY, 0, 90, moveSpeed, 0)
+			truck.nudge(0,0,moveX-moveSpeed);
+			fuelbox.nudge(0,0,moveX-moveSpeed)
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
+	    	world.setUserPosition(truck.x, 7, truck.z+10);
+		}
+		else if((rotationY<=180 && rotationY>90)){
+			moveX = map(rotationY, 90, 180, 0, moveSpeed)
+			truck.nudge(0,0,moveX-moveSpeed);
+			fuelbox.nudge(0,0,moveX-moveSpeed);
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			// world.camera.nudgePosition((-moveX*2), 0, (moveX-moveSpeed)*2);
+	    	world.setUserPosition(truck.x, 7, truck.z+10);
+		}
+		else if((rotationY<=270 && rotationY>180)){
+			moveX = map(rotationY, 270, 180, 0, moveSpeed)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(-moveX,0,0);
+			fuelbox.nudge(-moveX,0,0);
+			// world.camera.nudgePosition((-moveX*2), 0, -(moveX-moveSpeed)*2);
+	    	world.setUserPosition(truck.x, 7, truck.z+10);
+		}
+		else if((rotationY<=360 && rotationY>270)){
+			moveX = map(rotationY, 270, 360, 0, moveSpeed)
+			truck.nudge(0,0,-(moveX-moveSpeed));
+			fuelbox.nudge(0,0,-(moveX-moveSpeed));
+			truck.nudge(moveX,0,0);
+			fuelbox.nudge(moveX,0,0);
+			// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
+	    	world.setUserPosition(truck.x, 7, truck.z+10);
+		}
 
-	if (keyIsDown(68)){
-		truck.spinY(-2);
-		fuelbox.spinY(-2);
+		if (keyIsDown(68)){
+			truck.spinY(-2);
+			fuelbox.spinY(-2);
+		}
+		if (keyIsDown(65)){
+			truck.spinY(2);
+			fuelbox.spinY(2);
+		}
 	}
-	if (keyIsDown(65)){
-		truck.spinY(2);
-		fuelbox.spinY(2);
-	}
-}
 }
 
 function placecar() {
@@ -372,8 +389,18 @@ function placecar() {
 		red:255, green:0, blue:0,
 	});
 
-	world.add(fuelbox);
+	// coin text
+	cointext = new Text({
+		text: collections,
+		red: 128, green: 64, blue: 0,
+		side: 'double',
+		x: carX, y: 3, z: carZ,
+		scaleX: 4, scaleY: 4, scaleZ: 4
+	});
 
+	world.add(cointext);
+
+	world.add(fuelbox);
 	// Making the truck collidable with other objects
 	truck.tag.setAttribute('static-Body', "shape: box; mass: 100");
 	world.add(truck);
@@ -509,7 +536,7 @@ function placefuel () {
 	});
 	// Fuel button
 	let fuelbutton = new Cylinder ({
-		x: 6.3, y:4, z:-24.2,
+		x: 5.8, y:4, z:-24.2,
 		height: 0.03,
 		radius: 0.2,
 		red: 0, green:255, blue:0,
@@ -539,7 +566,7 @@ function placefuel () {
 		text: 'FILL',
 		red: 0, green: 51, blue: 0,
 		side: 'double',
-		x: 6.3, y: 4, z: -24.16,
+		x: 5.8, y: 4, z: -24.16,
 		scaleX: 4, scaleY: 4, scaleZ: 4
 	});
 
@@ -561,6 +588,38 @@ function keyPressed(){
 			console.log("newy " + boxes[0].box.x)
 			boxes[0].box.z = boxes[0].pz;
 			console.log("newz " + boxes[0].box.x)
+	}
+}
+
+// coin class
+class Coin {
+	// gate Model
+	constructor(){
+		this.coin = new GLTF({
+			asset: 'coin',
+			x: random(-30, 30),y: 1,z:random(-95, 0),
+			scaleX:0.08,scaleY:0.08,scaleZ:0.08
+		});
+		// coins.push(this.coin)
+		world.add(this.coin);
+		this.time = 0;
+	}
+
+	destroy(){
+		this.time += 1
+		if (this.time == 700){
+			world.remove(this.coin)
+			return "gone"
+		}
+		else if (dist(truck.x, truck.z, this.coin.x, this.coin.z) <= 2){
+			collections += 1
+			cointext.setText(collections)
+			world.remove(this.coin)
+			return "gone"
+		}
+		else {
+			return "ok"
+		}
 	}
 }
 
