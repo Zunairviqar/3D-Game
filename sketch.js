@@ -145,7 +145,7 @@ function draw() {
 	}
 
 	// add coins
-	if (frameCount % 100 == 0){
+	if (frameCount % 300 == 0){
 		coins.push(new Coin())
 	}
 	// remove coins
