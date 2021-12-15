@@ -54,10 +54,6 @@ function preload() {
 	honk = loadSound("sounds/honk.mp3");
 	coinCol = loadSound("sounds/collection.wav")
 	click = loadSound("sounds/clicked.wav");
-	// to be added
-	bricks = loadSound("sounds/bricks.mp3");
-	collision = loadSound("sounds/collision.mp3");
-	fence = loadSound("sounds/fence.mp3");
 }
 
 
