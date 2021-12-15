@@ -114,7 +114,7 @@ function draw() {
 	sounds();
 
 	world.camera.holder.object3D.rotation.set(radians(-25), 0, 0);
-	
+
 	// always create a new rain particle
 	var temp = new Particle(random(-20, 20), 15, random(-80,10));
 
@@ -324,6 +324,7 @@ function carMovement () {
 			carDrive.play()
 		}
 		//world.camera.nudgePosition(-moveSpeed, 0, 0);
+		// The element of 'velocity' of the car is increaded by the accelration (in the opposite (left) direction).
 		velocity.add(-accel, 0);
 	}
 	// if W is pressed
@@ -332,6 +333,7 @@ function carMovement () {
 			carDrive.play()
 		}
 		//world.camera.nudgePosition(moveSpeed, 0, 0);
+		// The element of 'velocity' of the car is increaded by the accelration.
 		velocity.add(accel, 0);
 	}
 	// if D is pressed
@@ -340,6 +342,7 @@ function carMovement () {
 			carDrive.play()
 		}
 		//world.camera.nudgePosition(0, 0, -moveSpeed);
+		// The car is accelerated in the forward direction by increasing the velocity.
 		velocity.add(0, -accel);
 	}
 	// if A is pressed
@@ -348,10 +351,12 @@ function carMovement () {
 			carDrive.play()
 		}
 		//world.camera.nudgePosition(0, 0, moveSpeed);
+		// The is decelerated backwards by decreasing the velocity.
 		velocity.add(0, accel);
 	}
 
 	// apply friction
+	// Making a copy of velocity, friction, in order to add it in the opposite direction of velocity
 	friction = velocity.copy();
 	friction.mult(-1);
 	friction.normalize();
@@ -371,18 +376,25 @@ function carMovement () {
 	moveSpeed = map(velocity.y,-1,1,0.6,-0.6)
 
 	// car movement
+	// Ensuring the rotation of the car is perceived as the correct value
 	if(truck.rotationY<0){
 		rotationY = truck.rotationY%360 + 360;
 	}
 	else{
 		rotationY = truck.rotationY%360;
 	}
+	// If the car is in the first quadrant, we increase the speed in such a manner
 	if(rotationY<=90 && rotationY>=0){
+		// We map the vector in the 'right' direction with the angle of rotation.
 		moveX = map(rotationY, 0, 90, moveSpeed, 0)
+		// We move the truck in the forward direction with the vector resulting from the subtraction of the totalspeed of the car, with the 'right' vector
 		truck.nudge(0,0,moveX-moveSpeed);
+		// Ensuring the fuelbox and the coins follow the car.
 		fuelbox.nudge(0,0,moveX-moveSpeed)
 		cointext.nudge(0,0,moveX-moveSpeed)
+		// Then we move the car in the 'right' direction with the remaining amount.
 		truck.nudge(moveX,0,0);
+		// Ensuring the fuelbox and the coins follow the car.
 		fuelbox.nudge(moveX,0,0);
 		cointext.nudge(moveX,0,0);
 		// world.camera.nudgePosition((moveX*2), 0, (moveX-moveSpeed)*2);
@@ -421,7 +433,7 @@ function carMovement () {
 		// world.camera.nudgePosition((moveX*2), 0, -(moveX-moveSpeed)*2);
     	world.setUserPosition(truck.x, 7, truck.z+10);
 	}
-
+	// Rotating the car on the A and S keys.
 	if (keyIsDown(68)){
 		truck.spinY(-2);
 		fuelbox.spinY(-2);
