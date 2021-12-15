@@ -41,6 +41,9 @@ let position, velocity;
 const frictionMag = 0.005;
 let friction;
 
+// game over text
+let overtext;
+
 // sound
 let carDrive, honk, click, bricks, collision, fence, coinCol, rain;
 
@@ -131,13 +134,18 @@ function draw() {
 	}
 
 	// decrement fuel after some time
-	if (frameCount % 200 == 0 && fuelbox.getWidth() >= 0.09){
+	if (frameCount % 20 == 0 && fuelbox.getWidth() >= 0.09){
 		fuelbox.setWidth(fuelbox.getWidth()-0.09);
 	}
 
 	// only move car if there is fuel
 	if (fuelbox.getWidth() > 0.01) {
 		carMovement();
+	}
+	else {
+		console.log("over")
+		overtext.setPosition(truck.getX(), 4, truck.getZ());
+		overtext.toggleVisibility();
 	}
 
 	// add coins
@@ -656,6 +664,18 @@ function placefuel () {
 		scaleX: 4, scaleY: 4, scaleZ: 4
 	});
 
+	// fuel empty/ game over text
+	overtext = new Text({
+		text: 'OUT OF FUEL',
+		red: 0, green: 0, blue: 0,
+		side: 'double',
+		x: 5.8, y: -10, z: -24.16,
+		show: false,
+		hide: true,
+		scaleX: 26, scaleY: 26, scaleZ: 26
+	});
+
+	world.add(overtext)
 	world.add(fueltext);
 	world.add(fuelbutton);
 	world.add(parking);
